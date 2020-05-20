@@ -1,93 +1,96 @@
 import React, { useState, useEffect, createRef } from 'react'
 import axios from 'axios'
 import './App.css'
-import IssueList from './components/IssueList'
+import { 
+  BrowserRouter as Router, Redirect } from 'react-router-dom'
+import Navigation from './components/Navigation'
+
 
 const App = () => {
 
   const [filter, setFilter]= useState('')
   const [issues, setIssues] = useState([])
-  const [url, setUrl] = useState('https://api.github.com/search/issues?' + 
-  `q=${filter}+label:bug+language:react+state:open&sort=created&order=asc&` +
-  'per_page=25')
+  const [url, setUrl] = useState('')  
+  //`q=${filter}+label:bug+language:react+state:open&sort=created&order=asc&` +
+  //'per_page=25')
   const [paginationLinks, setPaginationLinks] = useState('')
-  const [currentPage, setCurrentPage] = useState('')
+  const [currentPage, setCurrentPage] = useState('1')
+  const [totalCount, setTotalCount] = useState('')
     
   let input = createRef()
- 
+  let baseUrl = 'https://api.github.com/search/issues?q='
+
+
+  //if search term has been entered, URL is not equal to baseUrl anymore.
+  //get the information from the API with response.data.items, headers.link and 
+  //total_count
+  useEffect(() => {
+    if (url === undefined) {
+      //do nothing
+    } else {
+      
+      axios.get(url)
+        .then(response => {
+          if (filter !== '') {
+            console.log('App useEffect()')
+            setIssues(response.data.items)
+            setPaginationLinks(response.headers.link)
+            setTotalCount(response.data.total_count)
+            console.log(response.data.total_count)
+            console.log('url',url)
+          }
+        })
+        .catch(() => {          
+          setIssues([])
+          return (
+            <Router>
+              <Redirect to='/' />
+            </Router>)
+        })
+        // eslint-disable-next-line
+    }},[url])
+
+  
+  //when submitting a search, set the new URL and remember the search term 
+  //as filter. 
   const handleSubmit = (event) => {
     event.preventDefault()
+    setUrl(baseUrl+input.value)
+    //console.log(baseUrl+input.value+'&page=1')
     setFilter(input.value)
+    setCurrentPage('1')
   }
 
-  useEffect(() => {
-    axios.get(url)
-      .then(response => {
-        setIssues(response.data.items)
-        setPaginationLinks(response.headers.link)
-        console.log(response.data) 
-      })
-  },[url, filter])
+  ///when no search term is entered, go back to root
+  const redirectAfterSearch = () => {
 
-  const pagination = rel => {
-    
-    console.log('linkheader', paginationLinks)
-
-    const linkRegex = /<([^>]+)/g
-    const relRegex = /rel="([^"]+)/g
-    const linkArray = []
-    const relArray = []
-    let temp = 0
-
-       
-    while ((temp = linkRegex.exec(paginationLinks)) !== null) {
-      linkArray.push(temp[1])
+    if (filter === '') {
+      return (
+        <Router>
+          <Redirect to='/' />
+        </Router>)
     }
-
-    while ((temp = relRegex.exec(paginationLinks)) !== null) {
-      relArray.push(temp[1])
-    }
-
-    const result = relArray.reduce((object, value, index) => {
-      object[value] = linkArray[index]
-      return object
-    }, {})
-
-    console.log('result', result[rel])
-
-    setUrl(result[rel])
-
-    const pageRegex = /&page=[0-9]+/g
-    const helper = pageRegex.exec(result[rel])[0].split('=')[1]
-    
-    setCurrentPage(helper)
   }
-
-  const navigation = () => (
-    
-    <div>
-      <div onClick={() => pagination('prev')}>Previous </div>
-      <div onClick={() => pagination('first')}>First </div>
-      <div onClick={() => pagination('next')}>Next </div>
-      <div onClick={() => pagination('last')}>Last </div>
-    </div>
-  )
-  
 
   return (
-    <div>
+    <div className='page'>
+      
       <form onSubmit={handleSubmit}>
         <label>Search: </label>
         <input type='text' ref={(element) => input = element}></input>
-        <button type='submit'>OK</button>
       </form>
+      {redirectAfterSearch()}
       <br></br>
-      {navigation()}
+      <Navigation 
+        filter={filter}
+        totalCount={totalCount}
+        currentPage={currentPage}
+        issues={issues}
+        paginationLinks={paginationLinks}
+        setUrl={setUrl}
+        setCurrentPage={setCurrentPage}
+      />
       
-      <h3>Issues</h3>
-      <div></div>
-      
-      <div>{<IssueList filter={filter} issues={issues} />}</div>
     </div>
   )
 }
