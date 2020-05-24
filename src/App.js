@@ -4,6 +4,7 @@ import './App.css'
 import { 
   BrowserRouter as Router, Redirect } from 'react-router-dom'
 import Navigation from './components/Navigation'
+import '@fortawesome/fontawesome-free/css/all.css'
 
 
 const App = () => {
@@ -11,8 +12,6 @@ const App = () => {
   const [filter, setFilter]= useState('')
   const [issues, setIssues] = useState([])
   const [url, setUrl] = useState('')  
-  //`q=${filter}+label:bug+language:react+state:open&sort=created&order=asc&` +
-  //'per_page=25')
   const [paginationLinks, setPaginationLinks] = useState('')
   const [currentPage, setCurrentPage] = useState('1')
   const [totalCount, setTotalCount] = useState('')
@@ -32,12 +31,14 @@ const App = () => {
       axios.get(url)
         .then(response => {
           if (filter !== '') {
+            console.log('----------------------------------------------------')
             console.log('App useEffect()')
             setIssues(response.data.items)
             setPaginationLinks(response.headers.link)
             setTotalCount(response.data.total_count)
-            console.log(response.data.total_count)
+            window.scrollTo(0, 0)
             console.log('url',url)
+            console.log('----------------------------------------------------')
           }
         })
         .catch(() => {          
@@ -55,30 +56,42 @@ const App = () => {
   //as filter. 
   const handleSubmit = (event) => {
     event.preventDefault()
-    setUrl(baseUrl+input.value)
+    setCurrentPage('1')
+    setUrl(baseUrl+input.value+'&page=1')
     //console.log(baseUrl+input.value+'&page=1')
     setFilter(input.value)
-    setCurrentPage('1')
   }
 
   ///when no search term is entered, go back to root
   const redirectAfterSearch = () => {
-
+    
     if (filter === '') {
       return (
         <Router>
           <Redirect to='/' />
         </Router>)
     }
+    else return (
+      <Router>
+        <span>{console.log('redirect')}
+          <Redirect to={`/issues/${Number(currentPage)}`} /></span>
+      </Router>)
   }
 
   return (
     <div className='page'>
       
-      <form onSubmit={handleSubmit}>
-        <label>Search: </label>
-        <input type='text' ref={(element) => input = element}></input>
-      </form>
+      <div className='menu'>
+        <form onSubmit={handleSubmit} className='searchbar'>
+          <label>Search: </label>
+          <input type='text' ref={(element) => input = element}
+            className='search-input'
+          ></input>
+        </form> 
+        <i className="fas fa-bars"></i>
+        <span id='repositories'>Repositories</span>
+        <span>Users</span>
+      </div>
       {redirectAfterSearch()}
       <br></br>
       <Navigation 

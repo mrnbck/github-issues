@@ -1,25 +1,99 @@
-.page {
-  width: 1200px;
-  background-color: lightblue;
-  margin: 0 auto;
+body {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
+}
+
+.menu {
+  display: flex;
+  flex-direction: row;
+  background-color: #252525;
+  color: #fdf6f6;
   padding: 15px;
+  align-items: center;
+}
+
+.search-input {
+  width: 250px;
+  line-height: 20px;
+  padding: 3px;
+  font-size: 16px;
+  margin: 0 30px;
+  padding-left: 10px;
+}
+
+h3 {
+  color: #252525;
 }
 
 .issue-list {
+  width: 1200px;
+  margin: 0 auto;
   margin-bottom: 20px;
-  border-bottom: 1px solid gray;
+  border-bottom: 1px solid #cbcbcb;
 }
 
 .issue-list-item {
   padding: 20px;
-  border: 1px solid gray;
+  border: 1px solid #cbcbcb;
   border-bottom: none;
+  color: #252525
 }
 
 
 .pagination {
-  color: white;
-  background-color: darkblue;
+  display: inline-block;
+  color: #4f758b;
+  background-color: #fdf6f6;
   padding: 10px;
-  border: 1px solid;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  border: 1px solid #cbcbcb;
+  border-right: none;
+  text-decoration: none;
+  text-align: center;
+  transition: background-color .7s;
+}
+
+.pagination:hover {
+  background-color: #ddd;
+  height: 18px;
+
+}
+
+.previous-next {
+  display: inline-block;
+  color: #4f758b;
+  background-color: #fdf6f6;
+  padding: 10px;
+  height: 20px;
+  line-height: 20px;
+  border: 1px solid #cbcbcb;
+  text-decoration: none;
+  text-align: center;
+}
+
+#first {
+  border-right: none;
+}
+
+.pagination-links {
+  display: flex;
+  justify-content: center;
+  margin: 30px 0;
+}
+
+.pagination.active {
+  color: #fdf6f6;
+  background-color: #4f758b;
+  border:none;
+  line-height: 22px;
+  height: 22px;
+  width: 22px;
+}
+
+#repositories {
+  margin: 0 30px;
 }

@@ -2,11 +2,10 @@ import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 
 const IssueList = ({ 
-  page, paginationLinks, setUrl, setCurrentPage, issues,  }) => {
+  page, currentPage, paginationLinks, 
+  setUrl, setCurrentPage, issues }) => {
   
-  //console.log('paginationLinks', paginationLinks)
-    
-  const linkRegex = /<([^\d]+)/g    ///<([^\d]+)/g
+  const linkRegex = /<([^>]+)/g    ///<([^\d]+)/g
   const linkArray = []
   let temp = 0
   
@@ -16,21 +15,26 @@ const IssueList = ({
     }
   }
 
-  //get the last page and remove the last 2 digits (since max number
-  //is 34 page with 30 entries per page
-  //change later and base it on items per page instead of hardcode)
-  const link = linkArray[1].slice(0,linkArray[1].length-2)
+  //get pagination links and remove the last digit
+  let digits = 0
+  let link = ''
 
-  //console.log(link)
+  currentPage > 10 ? digits = 2 : digits = 1
+  if (linkArray.length > 0) {
+    link = linkArray[0].slice(0,linkArray[0].length-digits)}
+
+  console.log('linkArray in IssueList',linkArray)
   //console.log(linkRegex.exec(paginationLinks))
  
   
   useEffect(() => {
+    console.log('----------------------------------------------------')
     console.log('IssueList useEffect')
     if (link.length > 0) {
-      setUrl(linkArray[0]+page)
+      console.log('link+page', link+page)
+      setUrl(link+page)
       setCurrentPage(page)
-      console.log('page',page)
+      console.log('----------------------------------------------------')
     }    
     //console.log('newUrl', linkArray[0]+page)
     // eslint-disable-next-line
@@ -55,7 +59,8 @@ IssueList.propTypes = {
   setCurrentPage: PropTypes.func,
   setUrl: PropTypes.func,
   paginationLinks: PropTypes.string,
-  page: PropTypes.string
+  page: PropTypes.string,
+  currentPage: PropTypes.string
 }
 
 export default IssueList
