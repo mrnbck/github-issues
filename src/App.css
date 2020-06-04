@@ -3,15 +3,20 @@ body {
   margin: 0;
   box-sizing: border-box;
   font-family: 'Roboto', sans-serif;
+  overflow-x: hidden;
 }
 
 .menu {
   display: flex;
+  width: 100%;
+  overflow-x: hidden;
+  position: absolute;
   flex-direction: row;
   background-color: #252525;
   color: #fdf6f6;
   padding: 15px;
   align-items: center;
+  z-index: 2;
 }
 
 .search-input {
@@ -19,18 +24,18 @@ body {
   line-height: 20px;
   padding: 3px;
   font-size: 16px;
-  margin: 0 30px;
+  margin-left: 30px;
   padding-left: 10px;
 }
 
 h3 {
   color: #252525;
+  margin-top: 90px;
 }
 
 .issue-list {
   width: 1200px;
-  margin: 0 auto;
-  margin-bottom: 20px;
+  margin: 60px auto;
   border-bottom: 1px solid #cbcbcb;
 }
 
@@ -40,7 +45,6 @@ h3 {
   border-bottom: none;
   color: #252525
 }
-
 
 .pagination {
   display: inline-block;
@@ -54,13 +58,12 @@ h3 {
   border-right: none;
   text-decoration: none;
   text-align: center;
-  transition: background-color .7s;
+  transition: .7s;
 }
 
 .pagination:hover {
   background-color: #ddd;
   height: 18px;
-
 }
 
 .previous-next {
@@ -96,4 +99,86 @@ h3 {
 
 #repositories {
   margin: 0 30px;
+}
+
+.extended-search {
+  width: 100%;
+  padding: 15px;
+  height: 0;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background-color: #ededed ;
+  transition: .7s;
+ }
+
+ #extended-search-content {
+  top: -450px;
+ }
+
+.extended-search span {
+  position: relative;
+  top: 0;
+  color: black;
+  transition: .5s;
+  }
+
+#open-extended-icon {
+  position: relative;
+  left: -20px;
+  transition: .5s;
+  color: #252525;
+  cursor: pointer;
+  }
+
+.form-field {
+  margin-bottom: 20px;
+}
+
+.input-label {
+  line-height: 30px;
+}
+
+.radio-label {
+  margin-left: 10px;
+}
+
+.picklist {
+  line-height: 30px;  
+  margin: 0 10px;
+  font-size: 14px;
+}
+
+.user-org-input {
+  width: 250px;
+  line-height: 16px;
+  padding: 3px;
+  font-size: 16px;
+  margin-left: 10px;
+  margin-right: 10px;
+  padding-left: 10px;
+  border: none;
+}
+
+.searchbar {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.OK-button {
+  position: relative;
+  background-color: #252525;
+  color: white;
+  font-weight: bold;
+  left: -11px;
+  height: 33px;
+  border-style: none;
+  
+}
+
+.OK-button:active {
+  
+  transform: translateY(1px);
 }

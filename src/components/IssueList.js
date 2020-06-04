@@ -23,18 +23,18 @@ const IssueList = ({
   if (linkArray.length > 0) {
     link = linkArray[0].slice(0,linkArray[0].length-digits)}
 
-  console.log('linkArray in IssueList',linkArray)
+  //console.log('linkArray in IssueList',linkArray)
   //console.log(linkRegex.exec(paginationLinks))
  
   
   useEffect(() => {
-    console.log('----------------------------------------------------')
-    console.log('IssueList useEffect')
+    //console.log('----------------------------------------------------')
+    //console.log('IssueList useEffect')
     if (link.length > 0) {
-      console.log('link+page', link+page)
+      //console.log('link+page', link+page)
       setUrl(link+page)
       setCurrentPage(page)
-      console.log('----------------------------------------------------')
+      //console.log('----------------------------------------------------')
     }    
     //console.log('newUrl', linkArray[0]+page)
     // eslint-disable-next-line
