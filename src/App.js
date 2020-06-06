@@ -133,6 +133,7 @@ const App = () => {
 
   return (
     <div className='page'>
+
       <div className='menu'>
         <form onSubmit={handleSubmit} >
           <label>Search: </label>
@@ -142,12 +143,11 @@ const App = () => {
           <i className="fas fa-bars" onClick={extendedSearchBar}
             id='open-extended-icon' onMouseEnter={peakExtendedSearchBar}
             onMouseLeave={peakExtendedSearchBar}></i>
-          
         </form> 
-        
         <span id='repositories'>Repositories</span>
         <span>Users</span>
       </div>
+
       <div className='extended-search' id='open-extended'>
         <span id='extended-search-content'>
           <ExtendedSearch 
