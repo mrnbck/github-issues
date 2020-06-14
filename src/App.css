@@ -4,13 +4,14 @@ body {
   box-sizing: border-box;
   font-family: 'Roboto', sans-serif;
   overflow-x: hidden;
+  font-size: 14px;
 }
 
 .menu {
+  position: fixed;
   display: flex;
   width: 100%;
   overflow-x: hidden;
-  position: absolute;
   flex-direction: row;
   background-color: #252525;
   color: #fdf6f6;
@@ -23,19 +24,23 @@ body {
   width: 250px;
   line-height: 20px;
   padding: 3px;
-  font-size: 16px;
+  font-size: 14px;
   margin-left: 30px;
   padding-left: 10px;
 }
 
-h3 {
+h2 {
   color: #252525;
-  margin-top: 90px;
+  margin: 30px 15px;
 }
 
+h3 {
+  color: #252525;
+  }
+
 .issue-list {
-  width: 1200px;
-  margin: 60px auto;
+  width: 80%;
+  margin: 0px auto 60px;
   border-bottom: 1px solid #cbcbcb;
 }
 
@@ -102,15 +107,16 @@ h3 {
 }
 
 .extended-search {
+  overflow: scroll;
+  height: 0;
   width: 100%;
   padding: 15px;
-  height: 0;
-  position: fixed;
+  padding-bottom: 60px;
   z-index: 1;
   top: 0;
   left: 0;
-  background-color: #ededed ;
-  transition: .7s;
+  background-color: #cbcbcb;
+  transition: .5s;
  }
 
  #extended-search-content {
@@ -127,13 +133,26 @@ h3 {
 #open-extended-icon {
   position: relative;
   left: -20px;
-  transition: .5s;
+  transition: .2s;
   color: #252525;
   cursor: pointer;
   }
 
 .form-field {
   margin-bottom: 20px;
+  margin-left: 15px;
+  transition: 0.4s;
+  animation: slide-in 0.4s;
+}
+
+@keyframes slide-in {
+  0%   {
+    margin-left: -30px;
+    opacity: 0;
+  }
+  100% {
+    margin-left: 15px;
+    opacity: 1;}
 }
 
 .input-label {
@@ -150,11 +169,11 @@ h3 {
   font-size: 14px;
 }
 
-.user-org-input {
+.input-field {
   width: 250px;
   line-height: 16px;
   padding: 3px;
-  font-size: 16px;
+  font-size: 14px;
   margin-left: 10px;
   margin-right: 10px;
   padding-left: 10px;
@@ -173,12 +192,31 @@ h3 {
   color: white;
   font-weight: bold;
   left: -11px;
-  height: 33px;
+  height: 23px;
   border-style: none;
-  
-}
+  padding: 0 5px;
+  }
 
 .OK-button:active {
+  transform: translateY(1px);
+}
+
+.plus-button {
+  position: relative;
+  border: 1px solid #252525;
+  border-radius: 4px;
+  background-color: #252525;
+  color: white;
+  width: 20px;
+  height: 20px;
+  left: 15px;
+  text-align: center;
+  line-height: 20px;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.plus-button:active {
   transform: translateY(1px);
 }
 
@@ -191,38 +229,175 @@ h3 {
   top: 0;
   left: 0;
   visibility: hidden;
+  overflow-y: hidden;
   transition: 0.4s;
-}
+  z-index: 3;
+  }
 
 #qualifier-picker {
   position: fixed;
   top: 50%;
   left: 50%;
-  padding: 20px;
-  background-color: grey;
-  border: 3px solid #252525;
-  border-radius: 15px;
+  padding: 30px;
+  background-color: #252525;  
+  border: 3px solid #353535;  
+  border-radius: 5px;
   width: 0;
-  height: 0;
+  max-width: 500px;
+  max-height: 500px;
+  height: 0;  
   visibility: hidden;
   transform: translate(-50%, -50%);
   transition: .2s;
+  overflow-y: scroll;
+  scrollbar-color: darkGrey #252525;
+  z-index: 4;
 }
 
-.plus-button {
-  border: 1px solid #252525;
-  border-radius: 4px;
-  background-color: #252525;
+.qualifier-list {
   color: white;
-  width: 30px;
-  height: 30px;
-  margin: 0 auto;
-  text-align: center;
+  font-size: 14px;
   line-height: 30px;
-  cursor: pointer;
-  font-weight: bold;
 }
 
-.plus-button:active {
-  transform: translateY(1px);
+.qualifier-list-header {
+  font-size: 20px;
+  color: white;
+  margin-top: 0;
+  margin-bottom: 30px;
 }
+
+
+.On-Off-Button {
+  display: flex;
+  flex-direction: row;
+  align-content: center;
+  margin-bottom: 20px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  display: inline-block;
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 50px;
+  height: 29px;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 27px;
+  width: 27px;
+  top: 0px;
+  left: 2px;
+  bottom: 0px;
+  background-color: white;
+  -webkit-transition: .2s;
+  transition: .2s;
+}
+
+input:checked+.slider {
+  background-color: #3fd16f;
+}
+
+input:focus+.slider {
+  box-shadow: 0 0 1px #3fd16f;
+}
+
+input:checked+.slider:before {
+  -webkit-transform: translateX(21px);
+  -ms-transform: translateX(21px);
+  transform: translateX(21px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 24px;
+  margin-right: 20px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+
+@media only screen and (max-width: 600px) {
+  #qualifier-picker {
+    max-width: 350px;
+  }
+  .search-label {
+    visibility: hidden;
+    font-size: 0px;
+  }
+
+  .search-input {
+    margin-left: 0px;
+  }
+
+  #repositories, #users {
+    visibility: hidden;
+    font-size: 0px;
+  }
+
+  .input-field {
+    display: flex;
+    margin-left: 0;
+    margin-top: 10px;
+  }
+
+  .OK-button {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+    left: 0;
+  }
+
+  .form-field {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .picklist {
+    margin-left: 0px;
+  }
+
+  .searchbar {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+}
+
+@media only screen and (max-height: 600px) {
+  #qualifier-picker {
+    max-height: 250px;
+    max-width: 350px;    
+  }
+}
+
+@media only screen and (max-height: 300px) {
+  #qualifier-picker {
+    max-height: 150px;
+
+  }
+}
+
+
+
+

@@ -1,7 +1,11 @@
 import React, { useState, useEffect, createRef } from 'react'
 import PropTypes from 'prop-types'
+import QualifierChecker from '../QualifierChecker'
 
-const UserOrOrganization = ({ qualifiers, setQualifiers }) => {
+const UserOrOrganization = ({ 
+  qualifiers, 
+  setQualifiers,
+  userOrOrgToggle }) => {
 
   const [inputField, setInputField] = useState('')
   const [userSearch, setUserSearch] = useState('')
@@ -22,13 +26,13 @@ const UserOrOrganization = ({ qualifiers, setQualifiers }) => {
   let repositoryRef = createRef()
 
   //check which select option was chosen and save it in a state
-  const userOrOrganization = () => {
+  const selectFieldPicker = () => {
 
-    const userOrOrganization = 
+    const option = 
       document.getElementById('userOrOrganization').options
 
     const id = 
-      userOrOrganization[userOrOrganization.selectedIndex].value
+      option[option.selectedIndex].value
 
     console.log('id', id)
 
@@ -37,7 +41,7 @@ const UserOrOrganization = ({ qualifiers, setQualifiers }) => {
   }
 
   //track value in input field and save it in the correct state 
-  const userOrOrgValue = () => {
+  const inputFieldValue = () => {
     if (userRef.value) {
       setUserSearch(`user:${userRef.value}`)
     }
@@ -57,7 +61,6 @@ const UserOrOrganization = ({ qualifiers, setQualifiers }) => {
 
   const handleInputFields = () => {
   //check if there is an input field or if the option is "everywhere"
-    console.log('inputField',inputField)
 
     let id = ''
     //check which field was used
@@ -70,13 +73,16 @@ const UserOrOrganization = ({ qualifiers, setQualifiers }) => {
     if (userSearch && !repoSearch) {
       id = userSearch
     }
+    if (inputField === 'no filter') {
+      id = 'no filter'
+    }
 
     if (userInput === 'OK' && 
     //only reset when not empty. otherwise it will change every time due to 
     //useEffect()
     (userSearch !== '' || orgSearch !== '' || repoSearch !== '')
     ) {
-      if (inputField !== 'in:everywhere') {
+      if (inputField !== 'no filter') {
         document.getElementById('user-input').style.pointerEvents = 'none'
         document.getElementById('user-input').style.backgroundColor='#fdfdfd'
         document.getElementById('user-input').style.color = '#a6a6a6'
@@ -94,7 +100,7 @@ const UserOrOrganization = ({ qualifiers, setQualifiers }) => {
     }
 
     //create regex based on value in "id"
-    let  userRegex = /user:([\w])+/        
+    let userRegex = /user:([\w])+/        
     let orgRegex = /org:([\w])+/        
     let repoRegex = /repo:([\w])+\/[\w]+/
 
@@ -113,42 +119,11 @@ const UserOrOrganization = ({ qualifiers, setQualifiers }) => {
       }
       return null
     })
-    console.log('findEntry',findEntry)
-    const helper = findEntry[0]
-    let newQualifiers = []
-    console.log('qualifiers',qualifiers)
-    console.log('helper', helper)      
-    if (helper) {
-      console.log('qualifiers:',qualifiers[0], 'regex:', helper)
-  
-      if (qualifiers.includes(helper)) {
-      //if qualifiers is already used, get existing qualifiers up until
-      //current qualifier
-        newQualifiers = qualifiers.slice(0,qualifiers.indexOf(helper))
-        console.log('up until helper', newQualifiers)
-  
-        //skip the next entry and get the rest of the array to create a new
-        //without the qualifier
-        newQualifiers = newQualifiers.concat(qualifiers
-          .slice(qualifiers.indexOf(helper)+1, qualifiers.length+1))
-  
-        console.log('from helper til end', newQualifiers)
-            
-        //if the value is not 'everywhere' add it to the rest. that way a 
-        //qualifier is removed when 'everyhwere' is used
-        if (inputField !== 'in:everywhere' && id !== '') {
-          newQualifiers.push(`+${id}`)
-          console.log('after adding new qualifier', newQualifiers)
-        }
-        setQualifiers(newQualifiers)}
-    } else {
-      if (inputField !== 'in:everywhere' && id !== '') {
-        setQualifiers(qualifiers.concat(`+${id}`))
-      }
-    }
-  
+
+    QualifierChecker(findEntry, qualifiers, setQualifiers, id)
+      
     if(userInput === 'RESET') {
-      if (inputField !== 'in:everywhere') {
+      if (inputField !== 'no filter') {
         document.getElementById('user-input').style.pointerEvents = 'auto'
         document.getElementById('user-input').style.backgroundColor = 'white'
         document.getElementById('user-input').style.color = 'black'
@@ -172,17 +147,17 @@ const UserOrOrganization = ({ qualifiers, setQualifiers }) => {
   }
 
   //based on value in select show the correct input fields
-  const userOrOrgInput = () => {
+  const generateInputField = () => {
   
     switch(inputField) {
     case 'user:USERNAME': 
       return <span>
         <form className='searchbar' onSubmit={handleSubmit}><input 
-          className='user-org-input'
+          className='input-field'
           id='user-input'
           placeholder='Enter Username' 
           ref={(element) => userRef = element}
-          onChange={userOrOrgValue}
+          onChange={inputFieldValue}
         /><button id='user-input-button' className='OK-button'>{userInput}
         </button>
         </form>
@@ -190,11 +165,11 @@ const UserOrOrganization = ({ qualifiers, setQualifiers }) => {
     case 'org:ORGANIZATION': 
       return <span>
         <form className='searchbar' onSubmit={handleSubmit}><input 
-          className='user-org-input'
+          className='input-field'
           id='user-input'
           placeholder='Enter Organization'
           ref={(element) => orgRef = element}
-          onChange={userOrOrgValue}
+          onChange={inputFieldValue}
         /><button id='user-input-button' className='OK-button'>{userInput}
         </button>
         </form>
@@ -203,18 +178,18 @@ const UserOrOrganization = ({ qualifiers, setQualifiers }) => {
       return <span>
         <form className='searchbar' onSubmit={handleSubmit}>
           <input 
-            className='user-org-input'
+            className='input-field'
             id='user-input'
             placeholder='Enter Username' 
             ref={(element) => userRef = element}
-            onChange={userOrOrgValue}
+            onChange={inputFieldValue}
           />        
           <input 
-            className='user-org-input'
+            className='input-field'
             id='repo-input'
             placeholder='Enter Repository' 
             ref={(element) => repositoryRef = element}
-            onChange={userOrOrgValue}
+            onChange={inputFieldValue}
           />
           <button id='user-input-button' className='OK-button'>{userInput}
           </button>
@@ -226,33 +201,38 @@ const UserOrOrganization = ({ qualifiers, setQualifiers }) => {
 
   }
 
-  return (
-    <div className="form-field">
-      <label className="input-label">
-          Search within a user&apos;s or organization&apos;s repositories?
-      </label>
-      <span >
-        <select 
-          id='userOrOrganization'
-          className="picklist" 
-          defaultValue='Everywhere'
-          onChange={userOrOrganization}>
-          <option value='in:everywhere'>Everywhere</option>
-          <option value='user:USERNAME'>Username</option>
-          <option value='org:ORGANIZATION'>Organization</option>
-          <option value='repo:USERNAME/REPOSITORY'>Username/Repository
-          </option>            
-        </select>
-      </span>
-      {userOrOrgInput()}
-    </div>
-  )
+  if (userOrOrgToggle === false) {
+    return (<div></div>)
+  } else
+
+    return (
+      <div className="form-field">
+        <label className="input-label">
+          Search within a User&apos;s or Organization&apos;s Repositories
+        </label>
+        <span >
+          <select 
+            id='userOrOrganization'
+            className="picklist" 
+            defaultValue='Everywhere'
+            onChange={selectFieldPicker}>
+            <option value='no filter'>Everywhere</option>
+            <option value='user:USERNAME'>Username</option>
+            <option value='org:ORGANIZATION'>Organization</option>
+            <option value='repo:USERNAME/REPOSITORY'>Username/Repository
+            </option>            
+          </select>
+        </span>
+        {generateInputField()}
+      </div>
+    )
 
 }
 
 UserOrOrganization.propTypes = {
   qualifiers: PropTypes.array,
-  setQualifiers: PropTypes.func  
+  setQualifiers: PropTypes.func,
+  userOrOrgToggle: PropTypes.bool,
 }
 
 export default UserOrOrganization

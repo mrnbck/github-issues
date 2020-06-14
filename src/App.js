@@ -28,13 +28,14 @@ const App = () => {
   //get the information from the API with response.data.items, headers.link and 
   //total_count
   useEffect(() => {
+    console.log('url', url)
     if (url === undefined) {
       //do nothing
     } else {
       
       axios.get(url)
         .then(response => {
-          if (filter !== '') {
+          if (filter !== '' || qualifiers.length > 0) {
             //console.log('--------------------------------------------------')
             //console.log('App useEffect()')
             setIssues(response.data.items)
@@ -65,7 +66,7 @@ const App = () => {
     event.preventDefault()
     setCurrentPage('1')
     if (qualifiers.length > 0) {
-      setUrl(baseUrl+searchInput.value+qualifiers.join('')+'&page=1')
+      setUrl(baseUrl+searchInput.value+'+'+qualifiers.join('')+'&page=1')
     }
     else setUrl(baseUrl+searchInput.value+'&page=1')
     //console.log(baseUrl+input.value+'&page=1')
@@ -75,7 +76,7 @@ const App = () => {
   ///when no search term is entered, go back to root
   const redirectAfterSearch = () => {
     
-    if (filter === '') {
+    if (filter === '' && qualifiers.length === 0) {
       return (
         <Router>
           <Redirect to='/' />
@@ -91,20 +92,16 @@ const App = () => {
 
   const extendedSearchBar = () => {
     if (!open) { 
-      document.getElementById('open-extended').style.height = '450px'
+      document.getElementById('open-extended').style.height = '200vh'
       document.getElementById('open-extended').style.transition = '0.5s'
       document.getElementById('extended-search-content').style.top = '42px'
       document.getElementById('open-extended-icon').style.rotate = '90deg'
-      document.getElementById('main').style.marginTop = '510px'
-      document.getElementById('main').style.transition = '0.5s'
       setOpen(true)}
     else {
       document.getElementById('open-extended').style.height = '0px'
       document.getElementById('open-extended').style.transition = '0.5s'
       document.getElementById('extended-search-content').style.top = '-450px'
       document.getElementById('open-extended-icon').style.rotate = '0deg'
-      document.getElementById('main').style.marginTop = '0px'
-      document.getElementById('main').style.transition = '0.5s'
       setOpen(false)
     }
   }
@@ -112,40 +109,40 @@ const App = () => {
   const peakExtendedSearchBar = () => {
 
     if (!peak && !open) {
-      document.getElementById('open-extended').style.height = '56px'
-      document.getElementById('open-extended').style.transition = '0.1s' 
-      document.getElementById('open-extended-icon').style.transition = '0.3s'
+      document.getElementById('open-extended').style.height = '20px'
+      document.getElementById('open-extended').style.transition = '0.5s' 
+      document.getElementById('open-extended-icon').style.transition = '0.2s'
       document.getElementById('open-extended-icon').style.scale = '1.3'     
       setPeak(true)
     } 
     if (peak && !open) {
       document.getElementById('open-extended').style.height = '0px'
-      document.getElementById('open-extended').style.transition = '0.1s'
-      document.getElementById('open-extended-icon').style.transition = '0.3s'
+      document.getElementById('open-extended').style.transition = '0.5s'
+      document.getElementById('open-extended-icon').style.transition = '0.2s'
       document.getElementById('open-extended-icon').style.scale = '1.0'
       setPeak(false)
     }
     if (peak && open) {
-      document.getElementById('open-extended-icon').style.transition = '0.3s'
+      document.getElementById('open-extended-icon').style.transition = '0.2s'
       document.getElementById('open-extended-icon').style.scale = '1.0'
     }
   }
 
   return (
     <div className='page'>
-
       <div className='menu'>
         <form onSubmit={handleSubmit} >
-          <label>Search: </label>
-          <input type='text' ref={(element) => searchInput = element}
-            className='search-input'
-          ></input>
-          <i className="fas fa-bars" onClick={extendedSearchBar}
-            id='open-extended-icon' onMouseEnter={peakExtendedSearchBar}
-            onMouseLeave={peakExtendedSearchBar}></i>
+          <label className='search-label'>Search: </label>
+          <span>
+            <input type='text' ref={(element) => searchInput = element}
+              className='search-input'
+            ></input>
+            <i className="fas fa-bars" onClick={extendedSearchBar}
+              id='open-extended-icon' onMouseEnter={peakExtendedSearchBar}
+              onMouseLeave={peakExtendedSearchBar}></i></span>
         </form> 
         <span id='repositories'>Repositories</span>
-        <span>Users</span>
+        <span id='users'>Users</span>
       </div>
 
       <div className='extended-search' id='open-extended'>
@@ -163,9 +160,10 @@ const App = () => {
       <span></span>
       {redirectAfterSearch()}
       <br></br>
-      <div id='main'>
+      <div id='content'>
         <Navigation 
           filter={filter}
+          qualifiers={qualifiers} 
           totalCount={totalCount}
           currentPage={currentPage}
           issues={issues}
