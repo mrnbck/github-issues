@@ -17,35 +17,33 @@ const App = () => {
   const [currentPage, setCurrentPage] = useState('1')
   const [totalCount, setTotalCount] = useState('')
   const [open, setOpen] = useState(false)
-  const [peak, setPeak] = useState(false)
   const [qualifiers, setQualifiers] = useState([])
+  const [showIssue, setShowIssue] = useState(false)
     
   let searchInput = createRef()
   let baseUrl = 'https://api.github.com/search/issues?q='
-
 
   //if search term has been entered, URL is not equal to baseUrl anymore.
   //get the information from the API with response.data.items, headers.link and 
   //total_count
   useEffect(() => {
-    console.log('url', url)
+    //console.log('url', url)
     if (url === undefined) {
       //do nothing
-    } else {
-      
+    } else {      
       axios.get(url)
         .then(response => {
-          if (filter !== '' || qualifiers.length > 0) {
-            //console.log('--------------------------------------------------')
-            //console.log('App useEffect()')
+          if ((filter !== '' || qualifiers.length > 0) && 
+               Number(currentPage)>0 ) {
             setIssues(response.data.items)
             setPaginationLinks(response.headers.link)
             setTotalCount(response.data.total_count)
-
+            setShowIssue(false)
             window.scrollTo(0, 0)
             console.log(response.data)
-            console.log('qualifiers in App',qualifiers)
-            console.log('url',url)
+            //console.log('qualifiers in App',qualifiers)
+            //console.log('url',url)
+            //console.log('currentPage', Number(currentPage))
             console.log('----------------------------------------------------')
           }
         })
@@ -69,7 +67,6 @@ const App = () => {
       setUrl(baseUrl+searchInput.value+'+'+qualifiers.join('')+'&page=1')
     }
     else setUrl(baseUrl+searchInput.value+'&page=1')
-    //console.log(baseUrl+input.value+'&page=1')
     setFilter(searchInput.value)
   }
 
@@ -92,39 +89,22 @@ const App = () => {
 
   const extendedSearchBar = () => {
     if (!open) { 
-      document.getElementById('open-extended').style.height = '200vh'
-      document.getElementById('open-extended').style.transition = '0.5s'
+      document.getElementById('open-extended').style.maxHeight = '2000px'
+      document.getElementById('open-extended').style.transition = '0.3s'
       document.getElementById('extended-search-content').style.top = '42px'
-      document.getElementById('open-extended-icon').style.rotate = '90deg'
+      document.getElementById('extended-search-content')
+        .style.transition = '0.3s'
+      //document.getElementById('open-extended-icon').style.rotate = '90deg'
+      window.scrollTo(0, 0)
       setOpen(true)}
     else {
-      document.getElementById('open-extended').style.height = '0px'
-      document.getElementById('open-extended').style.transition = '0.5s'
+      document.getElementById('open-extended').style.maxHeight = '0'
+      document.getElementById('open-extended').style.transition = '0.2s'
       document.getElementById('extended-search-content').style.top = '-450px'
-      document.getElementById('open-extended-icon').style.rotate = '0deg'
+      document.getElementById('extended-search-content')
+        .style.transition = '0.5s'
+      //document.getElementById('open-extended-icon').style.rotate = '0deg'
       setOpen(false)
-    }
-  }
-
-  const peakExtendedSearchBar = () => {
-
-    if (!peak && !open) {
-      document.getElementById('open-extended').style.height = '20px'
-      document.getElementById('open-extended').style.transition = '0.5s' 
-      document.getElementById('open-extended-icon').style.transition = '0.2s'
-      document.getElementById('open-extended-icon').style.scale = '1.3'     
-      setPeak(true)
-    } 
-    if (peak && !open) {
-      document.getElementById('open-extended').style.height = '0px'
-      document.getElementById('open-extended').style.transition = '0.5s'
-      document.getElementById('open-extended-icon').style.transition = '0.2s'
-      document.getElementById('open-extended-icon').style.scale = '1.0'
-      setPeak(false)
-    }
-    if (peak && open) {
-      document.getElementById('open-extended-icon').style.transition = '0.2s'
-      document.getElementById('open-extended-icon').style.scale = '1.0'
     }
   }
 
@@ -135,14 +115,16 @@ const App = () => {
           <label className='search-label'>Search: </label>
           <span>
             <input type='text' ref={(element) => searchInput = element}
-              className='search-input'
-            ></input>
-            <i className="fas fa-bars" onClick={extendedSearchBar}
+              className='search-input'></input>
+            <span className='search-input-extended' onClick={extendedSearchBar}
+            >Extended</span>
+            {/*<i className="fas fa-bars" onClick={extendedSearchBar}
               id='open-extended-icon' onMouseEnter={peakExtendedSearchBar}
-              onMouseLeave={peakExtendedSearchBar}></i></span>
+              onMouseLeave={peakExtendedSearchBar}></i>*/}
+          </span>
         </form> 
-        <span id='repositories'>Repositories</span>
-        <span id='users'>Users</span>
+        {/*<span id='repositories'>Repositories</span>
+        <span id='users'>Users</span>*/}
       </div>
 
       <div className='extended-search' id='open-extended'>
@@ -154,6 +136,7 @@ const App = () => {
             filter = {filter}
             currentPage = {currentPage}
             setUrl={setUrl}
+            setOpen={setOpen}
           />
         </span>
       </div>
@@ -162,6 +145,8 @@ const App = () => {
       <br></br>
       <div id='content'>
         <Navigation 
+          showIssue={showIssue}
+          setShowIssue={setShowIssue}
           filter={filter}
           qualifiers={qualifiers} 
           totalCount={totalCount}

@@ -1,24 +1,37 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import QualifierChecker from '../QualifierChecker'
-
 
 const TitleBodyComment = ({ 
   qualifiers, 
   setQualifiers, 
   titleBodyCommentToggle }) => {
 
+  useEffect(() => {
+    if (titleBodyCommentToggle === false) {
+        
+      //remove qualifier when untoggled
+      let id = 'no filter'
+      let  regex = /in:([\w])+/
+      const findEntry = qualifiers.filter(value => regex.exec(value))
+      if (findEntry.length > 0) {
+        QualifierChecker(findEntry, qualifiers, setQualifiers, id)
+      }
+    }
+    // eslint-disable-next-line
+      },[titleBodyCommentToggle])
+
   //check if there's already a version of this qualifier in the query. if not, 
   //replace it with the new one.  
-  const titleBodyComment = () => {    
+  const selectFieldPicker = () => {    
     
-    const titleBodyComment = document.getElementById('titleBodyComment').options
+    const option = document.getElementById('titleBodyComment').options
     const id = 
-      titleBodyComment[titleBodyComment.selectedIndex].value
+      option[option.selectedIndex].value
 
     console.log(id)
 
-    let  regex = /\+in:([\w])+/
+    let  regex = /in:([\w])+/
 
     const findEntry = qualifiers.filter(value => regex.exec(value))
     console.log(findEntry)
@@ -32,13 +45,12 @@ const TitleBodyComment = ({
 
     return (
       <div className="form-field">
-        <label className="input-label">Search by title, body or comments?
-        </label>
+        <label className="input-label">Title, Body or Comments</label>
         <select 
           id='titleBodyComment' 
           className="picklist" 
           defaultValue='Everywhere' 
-          onChange={titleBodyComment}>
+          onChange={selectFieldPicker}>
           <option value='no filter'>Everywhere</option>
           <option value='in:title'>Title</option>
           <option value='in:body'>Body</option>

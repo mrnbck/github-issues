@@ -13,6 +13,32 @@ const UserOrOrganization = ({
   const [repoSearch, setRepoSearch] = useState('')
   const [userInput, setUserInput] = useState('OK')
 
+  useEffect(() => {
+    if (userOrOrgToggle === false) {
+      //remove qualifier when untoggled
+      let id = 'no filter'
+      let userRegex = /user:([\w])+/        
+      let orgRegex = /org:([\w])+/        
+      let repoRegex = /repo:([\w])+\/[\w]+/ 
+        
+      //check if any of the qualifiers is used by searching the regex. if true, 
+      //the others will result in blank.
+      const findUser = qualifiers.filter(value => userRegex.exec(value))
+      const findOrg = qualifiers.filter(value => orgRegex.exec(value))
+      const findRepo = qualifiers.filter(value => repoRegex.exec(value))
+      if (findUser.length > 0) {
+        QualifierChecker(findUser, qualifiers, setQualifiers, id)
+      } 
+      if (findOrg.length > 0) {
+        QualifierChecker(findOrg, qualifiers, setQualifiers, id)
+      }
+      if (findRepo.length > 0) {
+        QualifierChecker(findRepo, qualifiers, setQualifiers, id)
+      }
+    }
+    // eslint-disable-next-line
+      },[userOrOrgToggle]) 
+  
   //reset input fields when changing the field
   useEffect(() => {
     handleInputFields()

@@ -1,11 +1,17 @@
-import React, { useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
+import OpenIssue from './OpenIssue'
+import { useHistory } from 'react-router-dom'
+
 
 const IssueList = ({ 
   page, currentPage, paginationLinks, 
-  setUrl, setCurrentPage, issues }) => {
-  
-  const linkRegex = /<([^>]+)/g    ///<([^\d]+)/g
+  setUrl, setCurrentPage, issues,
+  showIssue,setShowIssue }) => {
+
+  const [issue, setIssue] = useState({})
+
+  const linkRegex = /<([^>]+)/g    
   const linkArray = []
   let temp = 0
   
@@ -23,35 +29,50 @@ const IssueList = ({
   if (linkArray.length > 0) {
     link = linkArray[0].slice(0,linkArray[0].length-digits)}
 
-  //console.log('linkArray in IssueList',linkArray)
-  //console.log(linkRegex.exec(paginationLinks))
  
-  
   useEffect(() => {
-    //console.log('----------------------------------------------------')
-    //console.log('IssueList useEffect')
-    if (link.length > 0) {
+    if (link.length > 0 && Number(page)>0) {
       //console.log('link+page', link+page)
       setUrl(link+page)
       setCurrentPage(page)
       //console.log('----------------------------------------------------')
     }    
-    //console.log('newUrl', linkArray[0]+page)
     // eslint-disable-next-line
   },[page])
 
- 
-    
-  return (
-    <div className='issue-list'>
-      <h3>Issues</h3>
-      
-      <div>{issues.map(issue => 
-        (<div key={issue.id} className='issue-list-item'>
-          {issue.title} </div>))}</div>
-    </div>
-  )
-  
+  const history = useHistory()
+
+  const openIssue = (issue) => {
+    //useState to make the issue available to move it to the next component
+    setIssue(issue)
+    setShowIssue(true)
+    history.push(`id/${issue.id}`)
+  }
+
+  //don't show issue list and pagination while we display and issue
+  if(showIssue) {    
+    return (
+      <span><OpenIssue 
+        showIssue={showIssue}
+        setShowIssue={setShowIssue}
+        issue={issue} 
+        currentPage={currentPage}
+      /></span>
+    )} else {
+    return (
+      <div className='issue-list'>
+        <h3>Issues</h3>      
+        <div>{issues.map(issue => 
+          (<div 
+            key={issue.id} 
+            className='issue-list-item' 
+            onClick={() => openIssue(issue) }>
+            {issue.title}
+          </div>))}
+        </div>
+      </div>
+    )
+  }  
 }
   
 IssueList.propTypes = {
@@ -60,7 +81,9 @@ IssueList.propTypes = {
   setUrl: PropTypes.func,
   paginationLinks: PropTypes.string,
   page: PropTypes.string,
-  currentPage: PropTypes.string
+  currentPage: PropTypes.string,
+  showIssue:PropTypes.bool,
+  setShowIssue:PropTypes.func
 }
 
 export default IssueList

@@ -19,18 +19,23 @@ import CommitStatus from './qualifiers/CommitStatus'
 import BranchName from './qualifiers/BranchName'
 import Language from './qualifiers/Language'
 import NumberOfComments from './qualifiers/NumberOfComments'
-import Interactions from './qualifiers/Interactions'
-import Reactions from './qualifiers/Reactions'
+import NumberOfInteractions from './qualifiers/NumberOfInteractions'
+import NumberOfReactions from './qualifiers/NumberOfReactions'
 import Draft from './qualifiers/Draft'
 import Review from './qualifiers/Review'
 import Merge from './qualifiers/Merged'
 import Archived from './qualifiers/Archived'
 import Locked from './qualifiers/Locked'
 import Metadata from './qualifiers/Metadata'
+import Label from './qualifiers/Label'
+import WhenCreated from './qualifiers/WhenCreated'
+import WhenUpdated from './qualifiers/WhenUpdated'
+import WhenClosed from './qualifiers/WhenClosed'
+import WhenMerged from './qualifiers/WhenMerged'
 
 const ExtendedSearch = ({ 
   qualifiers, setQualifiers,
-  baseUrl,filter, currentPage, setUrl }) => {
+  baseUrl,filter, currentPage, setUrl, setOpen }) => {
 
   const [issueOrPrToggle, setIssueOrPrToggle] = useState(true)
   const [titleBodyCommentToggle, setTitleBodyCommentToggle] = useState(false)
@@ -58,20 +63,32 @@ const ExtendedSearch = ({
   const [archiveToggle, setArchiveToggle] = useState(false)
   const [lockedToggle, setLockedToggle] = useState(false)
   const [metadataToggle, setMetadataToggle] = useState(false)
+  const [labelToggle, setLabelToggle] = useState(false)
+  const [whenCreatedToggle, setWhenCreatedToggle] = useState(false)
+  const [whenUpdatedToggle, setWhenUpdatedToggle] = useState(false)
+  const [whenClosedToggle, setWhenClosedToggle] = useState(false)
+  const [whenMergedToggle, setWhenMergedToggle] = useState(false)
 
   //reload every time qualifiers change
   useEffect(() => {
-    if (qualifiers.length > 0) {
+    if (qualifiers.length > 0 && filter !== '') {
+      setUrl(baseUrl+filter+'+'+qualifiers.join('')+'&page='+currentPage)
+    }
+    if (qualifiers.length > 0 && filter === '') {
       setUrl(baseUrl+filter+qualifiers.join('')+'&page='+currentPage)
     } 
-    else {
+    if (qualifiers.length === 0) {
       setUrl(baseUrl+filter+'&page='+currentPage)
     }
     // eslint-disable-next-line
   },[qualifiers])
 
+  const style = {
+    width: 'max-content'
+  }
+
   return (
-    <div>
+    <div style={style}>
       <h2>What would you like to search?</h2>
       <IssueOrPr qualifiers={qualifiers} setQualifiers={setQualifiers} 
         issueOrPrToggle={issueOrPrToggle}
@@ -177,13 +194,13 @@ const ExtendedSearch = ({
         numOfCommentsToggle={numOfCommentsToggle}
       />
 
-      <Interactions
+      <NumberOfInteractions
         qualifiers={qualifiers}
         setQualifiers={setQualifiers}
         interactionsToggle={interactionsToggle}
       />
 
-      <Reactions
+      <NumberOfReactions
         qualifiers={qualifiers}
         setQualifiers={setQualifiers}
         reactionsToggle={reactionsToggle}
@@ -219,12 +236,41 @@ const ExtendedSearch = ({
         lockedToggle={lockedToggle}
       />
 
+      <Label
+        qualifiers={qualifiers}
+        setQualifiers={setQualifiers}
+        labelToggle={labelToggle}
+      />
+
       <Metadata
         qualifiers={qualifiers}
         setQualifiers={setQualifiers}
         metadataToggle={metadataToggle}
       />
 
+      <WhenCreated
+        qualifiers={qualifiers}
+        setQualifiers={setQualifiers}
+        whenCreatedToggle={whenCreatedToggle}
+      />
+
+      <WhenUpdated
+        qualifiers={qualifiers}
+        setQualifiers={setQualifiers}
+        whenUpdatedToggle={whenUpdatedToggle}
+      />
+
+      <WhenClosed
+        qualifiers={qualifiers}
+        setQualifiers={setQualifiers}
+        whenClosedToggle={whenClosedToggle}
+      />
+
+      <WhenMerged
+        qualifiers={qualifiers}
+        setQualifiers={setQualifiers}
+        whenMergedToggle={whenMergedToggle}
+      />
 
       <QualifierPicker 
         setTitleBodyCommentToggle={setTitleBodyCommentToggle}
@@ -279,6 +325,17 @@ const ExtendedSearch = ({
         lockedToggle={lockedToggle}
         setMetadataToggle={setMetadataToggle}
         metadataToggle={metadataToggle}
+        setLabelToggle={setLabelToggle}
+        labelToggle={labelToggle}
+        setWhenCreatedToggle={setWhenCreatedToggle}
+        whenCreatedToggle={whenCreatedToggle}
+        setWhenUpdatedToggle={setWhenUpdatedToggle}
+        whenUpdatedToggle={whenUpdatedToggle}
+        setWhenClosedToggle={setWhenClosedToggle}
+        whenClosedToggle={whenClosedToggle}
+        setWhenMergedToggle={setWhenMergedToggle}
+        whenMergedToggle={whenMergedToggle}
+        setOpen={setOpen}
       />
       
     </div>
@@ -293,7 +350,8 @@ ExtendedSearch.propTypes = {
   baseUrl: PropTypes.string,
   filter: PropTypes.string,
   currentPage: PropTypes.string,
-  setUrl: PropTypes.func
+  setUrl: PropTypes.func,
+  setOpen: PropTypes.func
 }
 
 export default ExtendedSearch

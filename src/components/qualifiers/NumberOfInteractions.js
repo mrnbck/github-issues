@@ -13,6 +13,34 @@ const Interactions = ({
   const [rangeSearch, setRangeSearch] = useState('')
   const [inputOnOff, setInputOnOff] = useState('OK')
 
+  useEffect(() => {
+    if (interactionsToggle === false) {
+      //remove qualifier when untoggled
+      let id = 'no filter'
+      let moreThanRegex = /interactions:>([\d])+/        
+      let lessThanRegex = /interactions:<([\d])+/        
+      let rangeRegex = /interactions:([\d])+..[\d]+/
+        
+      //check if any of the qualifiers is used by searching the regex. if true, 
+      //the others will result in blank.
+      const moreThan = qualifiers.filter(value => moreThanRegex.exec(value))
+      if (moreThan.length > 0) {
+        QualifierChecker(moreThan, qualifiers, setQualifiers, id)
+      } else {
+        const lessThan = qualifiers.filter(value => lessThanRegex.exec(value))
+        if (lessThan.length > 0) {
+          QualifierChecker(lessThan, qualifiers, setQualifiers, id)
+        } else {
+          const range = qualifiers.filter(value => rangeRegex.exec(value))
+          if (range.length > 0) {
+            QualifierChecker(range, qualifiers, setQualifiers, id)
+          }
+        }
+      }
+    }
+    // eslint-disable-next-line
+      },[interactionsToggle]) 
+
   //reset input fields when changing the field
   useEffect(() => {
     handleInputFields()
@@ -207,7 +235,7 @@ const Interactions = ({
     return (
       <div className="form-field">
         <label className="input-label">
-          Search by Number of Interactions
+          Number of Interactions
         </label>
         <span >
           <select 

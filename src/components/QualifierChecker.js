@@ -6,7 +6,7 @@ const QualifierChecker = (
 
   const helper = findEntry[0]
   let newQualifiers = []
-     
+  
   if (helper) {
     console.log('qualifiers:',qualifiers[0], 'regex:', helper)
   
@@ -23,7 +23,7 @@ const QualifierChecker = (
   
       console.log('from helper til end', newQualifiers)
             
-      //if the value is not 'everywhere' add it to the rest. that way a 
+      //if the value is not 'no filter' add it to the rest. that way a 
       //qualifier is removed when 'everyhwere' is used
       if (id !== '' && id !== 'no filter') {
         newQualifiers.length === 0 ? 
@@ -34,11 +34,9 @@ const QualifierChecker = (
       setQualifiers(newQualifiers)}
   } else {
     if (id !== '' && 'no filter') {
-      
       qualifiers.length === 0 ?
         setQualifiers(qualifiers.concat(`${id}`)) : 
-        setQualifiers(qualifiers.concat(`+${id}`))
-      
+        setQualifiers(qualifiers.concat(`+${id}`))      
     }
   }
 }

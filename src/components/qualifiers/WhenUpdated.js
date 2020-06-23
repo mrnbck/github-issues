@@ -2,16 +2,45 @@ import React, { useState, useEffect, createRef } from 'react'
 import PropTypes from 'prop-types'
 import QualifierChecker from '../QualifierChecker'
 
-const Reactions = ({ 
+const NumberOfComments = ({ 
   qualifiers, 
   setQualifiers,
-  reactionsToggle }) => {
+  whenUpdatedToggle }) => {
 
   const [inputField, setInputField] = useState('')
   const [moreThanSearch, setMoreThanSearch] = useState('')
   const [lessThanSearch, setLessThenSearch] = useState('')
   const [rangeSearch, setRangeSearch] = useState('')
   const [inputOnOff, setInputOnOff] = useState('OK')
+
+  useEffect(() => {
+    if (whenUpdatedToggle === false) {
+      //remove qualifier when untoggled
+      let id = 'no filter'
+      let moreThanRegex = /updated:>(\d){4}-(\d){2}-(\d){2}/        
+      let lessThanRegex = /updated:<(\d){4}-(\d){2}-(\d){2}/       
+      let rangeRegex = 
+      /updated:(\d){4}-(\d){2}-(\d){2}..(\d){4}-(\d){2}-(\d){2}/ 
+        
+      //check if any of the qualifiers is used by searching the regex. if true, 
+      //the others will result in blank.
+      const moreThan = qualifiers.filter(value => moreThanRegex.exec(value))
+      if (moreThan.length > 0) {
+        QualifierChecker(moreThan, qualifiers, setQualifiers, id)
+      } else {
+        const lessThan = qualifiers.filter(value => lessThanRegex.exec(value))
+        if (lessThan.length > 0) {
+          QualifierChecker(lessThan, qualifiers, setQualifiers, id)
+        } else {
+          const range = qualifiers.filter(value => rangeRegex.exec(value))
+          if (range.length > 0) {
+            QualifierChecker(range, qualifiers, setQualifiers, id)
+          }
+        }
+      }
+    }
+    // eslint-disable-next-line
+      },[whenUpdatedToggle]) 
 
   //reset input fields when changing the field
   useEffect(() => {
@@ -29,12 +58,12 @@ const Reactions = ({
   const selectFieldPicker = () => {
 
     const option = 
-      document.getElementById('reactions').options
+      document.getElementById('whenUpdated').options
 
     const id = 
       option[option.selectedIndex].value
 
-    console.log('id', id)
+    //console.log('id', id)
 
     setInputField(id)    
   }
@@ -42,13 +71,13 @@ const Reactions = ({
   //track value in input field and save it in the correct state 
   const inputFieldValue = () => {
     if (moreThanRef.value) {
-      setMoreThanSearch(`reactions:>${moreThanRef.value}`)
+      setMoreThanSearch(`updated:>${moreThanRef.value}`)
     }
     if (lessThanRef.value) {
-      setLessThenSearch(`reactions:<${lessThanRef.value}`)
+      setLessThenSearch(`updated:<${lessThanRef.value}`)
     }
     if (rangeRef.value) {
-      setRangeSearch(`reactions:${moreThanRef.value}..${rangeRef.value}`)
+      setRangeSearch(`updated:${moreThanRef.value}..${rangeRef.value}`)
     }
   }
 
@@ -82,16 +111,21 @@ const Reactions = ({
     (moreThanSearch !== '' || lessThanSearch !== '' || rangeSearch !== '')
     ) {
       if (inputField !== 'no filter') {
-        document.getElementById('input-field').style.pointerEvents = 'none'
-        document.getElementById('input-field').style.backgroundColor='#fdfdfd'
-        document.getElementById('input-field').style.color = '#a6a6a6'
-        document.getElementById('input-field').style.textTransform='uppercase'
-        if(document.getElementById('range-input')) {
-          document.getElementById('range-input').style.pointerEvents = 'none'
-          document.getElementById('range-input').style.backgroundColor =
+        document.getElementById('updated-input-field')
+          .style.pointerEvents = 'none'
+        document.getElementById('updated-input-field')
+          .style.backgroundColor='#fdfdfd'
+        document.getElementById('updated-input-field')
+          .style.color = '#a6a6a6'
+        document.getElementById('updated-input-field')
+          .style.textTransform='uppercase'
+        if(document.getElementById('updated-range-input')) {
+          document.getElementById('updated-range-input')
+            .style.pointerEvents = 'none'
+          document.getElementById('updated-range-input').style.backgroundColor =
           '#fdfdfd'
-          document.getElementById('range-input').style.color='#a6a6a6'
-          document.getElementById('range-input').style.textTransform =
+          document.getElementById('updated-range-input').style.color='#a6a6a6'
+          document.getElementById('updated-range-input').style.textTransform =
           'uppercase'
         }
         setInputOnOff('RESET') 
@@ -99,9 +133,10 @@ const Reactions = ({
     }
 
     //create regex based on value in "id"
-    let moreThanRegex = /reactions:>([\d])+/        
-    let lessThanRegex = /reactions:<([\d])+/        
-    let rangeRegex = /reactions:([\d])+..[\d]+/
+    let moreThanRegex = /updated:>(\d){4}-(\d){2}-(\d){2}/        
+    let lessThanRegex = /updated:<(\d){4}-(\d){2}-(\d){2}/       
+    let rangeRegex = 
+    /updated:(\d){4}-(\d){2}-(\d){2}..(\d){4}-(\d){2}-(\d){2}/ 
 
     //search in qualifiers if current qualifier already exists
     //check all 3 regex since the key is different every time
@@ -123,19 +158,23 @@ const Reactions = ({
       
     if(inputOnOff === 'RESET') {
       if (inputField !== 'no filter') {
-        document.getElementById('input-field').style.pointerEvents = 'auto'
-        document.getElementById('input-field').style.backgroundColor = 'white'
-        document.getElementById('input-field').style.color = 'black'
-        document.getElementById('input-field').style.textTransform = 
+        document.getElementById('updated-input-field')
+          .style.pointerEvents = 'auto'
+        document.getElementById('updated-input-field')
+          .style.backgroundColor = 'white'
+        document.getElementById('updated-input-field').style.color = 'black'
+        document.getElementById('updated-input-field').style.textTransform = 
           'capitalize'
-        document.getElementById('input-field').value = ''
-        if(document.getElementById('range-input')) {
-          document.getElementById('range-input').style.pointerEvents = 'auto'
-          document.getElementById('range-input').style.backgroundColor='white'
-          document.getElementById('range-input').style.color = 'black'
-          document.getElementById('range-input').style.textTransform=
+        document.getElementById('updated-input-field').value = ''
+        if(document.getElementById('updated-range-input')) {
+          document.getElementById('updated-range-input')
+            .style.pointerEvents = 'auto'
+          document.getElementById('updated-range-input')
+            .style.backgroundColor='white'
+          document.getElementById('updated-range-input').style.color = 'black'
+          document.getElementById('updated-range-input').style.textTransform=
             'capitalize'
-          document.getElementById('range-input').value = ''
+          document.getElementById('updated-range-input').value = ''
         }
       }
       setInputOnOff('OK')
@@ -149,44 +188,48 @@ const Reactions = ({
   const generateInputField = () => {
   
     switch(inputField) {
-    case 'reactions:>n': 
+    case 'updated:>n': 
       return <span>
         <form className='searchbar' onSubmit={handleSubmit}><input 
           className='input-field'
-          id='input-field'
-          placeholder='Enter Number of Reactions' 
+          type='date'
+          id='updated-input-field'
+          placeholder='Enter Date YYYY-MM-DD' 
           ref={(element) => moreThanRef = element}
           onChange={inputFieldValue}
         /><button className='OK-button'>{inputOnOff}
         </button>
         </form>
       </span>
-    case 'reactions:<n': 
+    case 'updated:<n': 
       return <span>
         <form className='searchbar' onSubmit={handleSubmit}><input 
           className='input-field'
-          id='input-field'
-          placeholder='Enter Number of Reactions'
+          type='date'
+          id='updated-input-field'
+          placeholder='Enter Date YYYY-MM-DD'
           ref={(element) => lessThanRef = element}
           onChange={inputFieldValue}
         /><button className='OK-button'>{inputOnOff}
         </button>
         </form>
       </span>
-    case 'reactions:n..m': 
+    case 'updated:n..m': 
       return <span>
         <form className='searchbar' onSubmit={handleSubmit}>
           <input 
             className='input-field'
-            id='input-field'
-            placeholder='Enter Number of Reactions' 
+            type='date'
+            id='updated-input-field'
+            placeholder='Enter Date YYYY-MM-DD' 
             ref={(element) => moreThanRef = element}
             onChange={inputFieldValue}
           />        
           <input 
             className='input-field'
-            id='range-input'
-            placeholder='Enter Number of Reactions' 
+            type='date'
+            id='updated-range-input'
+            placeholder='Enter Date YYYY-MM-DD' 
             ref={(element) => rangeRef = element}
             onChange={inputFieldValue}
           />
@@ -200,25 +243,25 @@ const Reactions = ({
 
   }
 
-  if (reactionsToggle === false) {
+  if (whenUpdatedToggle === false) {
     return (<div></div>)
   } else
 
     return (
       <div className="form-field">
         <label className="input-label">
-          Search by Number of Reactions
+          When Updated
         </label>
         <span >
           <select 
-            id='reactions'
+            id='whenUpdated'
             className="picklist" 
             defaultValue='Everywhere'
             onChange={selectFieldPicker}>
             <option value='no filter'>All</option>
-            <option value='reactions:>n'>More Than</option>
-            <option value='reactions:<n'>Less Than</option>
-            <option value='reactions:n..m'>Range</option>            
+            <option value='updated:>n'>Later Than</option>
+            <option value='updated:<n'>Before</option>
+            <option value='updated:n..m'>Range</option>            
           </select>
         </span>
         {generateInputField()}
@@ -227,9 +270,9 @@ const Reactions = ({
 
 }
 
-Reactions.propTypes = {
+NumberOfComments.propTypes = {
   qualifiers: PropTypes.array,
   setQualifiers: PropTypes.func,
 }
 
-export default Reactions
+export default NumberOfComments

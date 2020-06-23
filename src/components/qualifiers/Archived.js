@@ -1,8 +1,22 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import QualifierChecker from '../QualifierChecker'
 
 const Archived = ({ qualifiers, setQualifiers, archiveToggle }) => {
+
+  useEffect(() => {
+    if (archiveToggle === false) {
+    
+      //remove qualifier when untoggled
+      let id = 'no filter'
+      let regex = /archived:([\w])+/
+      const findEntry = qualifiers.filter(value => regex.exec(value))
+      if (findEntry.length > 0) {
+        QualifierChecker(findEntry, qualifiers, setQualifiers, id)
+      }
+    }
+    // eslint-disable-next-line
+  },[archiveToggle])
 
   //check if there's already a version of this qualifier in the query. if not, 
   //replace it with the new one.  
@@ -11,7 +25,7 @@ const Archived = ({ qualifiers, setQualifiers, archiveToggle }) => {
     const option = document.getElementById('archived').options
     const id = option[option.selectedIndex].value
     
-    let regex = /\+archived:([\w])+/
+    let regex = /archived:([\w])+/
 
     const findEntry = qualifiers.filter(value => regex.exec(value))
 
@@ -26,7 +40,7 @@ const Archived = ({ qualifiers, setQualifiers, archiveToggle }) => {
   
     return (
       <div className="form-field">        
-        <label className="input-label">Draft Pull Requests</label>
+        <label className="input-label">Archived Repositories</label>
         <span >
           <select id='archived' className="picklist" defaultValue='Both' 
             onChange={selectFieldPicker}>

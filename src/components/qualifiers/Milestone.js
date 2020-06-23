@@ -7,6 +7,20 @@ const Milestone = ({
   setQualifiers, 
   milestoneToggle }) => {
 
+  useEffect(() => {
+    if (milestoneToggle === false) {
+        
+      //remove qualifier when untoggled
+      let id = 'no filter'
+      let regex = /milestone:([\w])+/
+      const findEntry = qualifiers.filter(value => regex.exec(value))
+      if (findEntry.length > 0) {
+        QualifierChecker(findEntry, qualifiers, setQualifiers, id)
+      }
+    }
+    // eslint-disable-next-line
+      },[milestoneToggle])
+
   const [inputField, setInputField] = useState('')
   const [search, setSearch] = useState('')
   const [inputOnOff, setInputOnOff] = useState('OK')
@@ -129,7 +143,7 @@ const Milestone = ({
   
     return (
       <div className="form-field">        
-        <label className="input-label">Search by Milestone</label>
+        <label className="input-label">Milestone</label>
         <span >
           <select 
             id='milestone' 

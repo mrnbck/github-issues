@@ -7,6 +7,20 @@ const Language = ({
   setQualifiers, 
   languageToggle }) => {
 
+  useEffect(() => {
+    if (languageToggle === false) {
+        
+      //remove qualifier when untoggled
+      let id = 'no filter'
+      let regex = /language:([\w])+/ 
+      const findEntry = qualifiers.filter(value => regex.exec(value))
+      if (findEntry.length > 0) {
+        QualifierChecker(findEntry, qualifiers, setQualifiers, id)
+      }
+    }
+    // eslint-disable-next-line
+      },[languageToggle])
+  
   const [inputField, setInputField] = useState('')
   const [search, setSearch] = useState('')
   const [inputOnOff, setInputOnOff] = useState('OK')
@@ -129,7 +143,7 @@ const Language = ({
   
     return (
       <div className="form-field">        
-        <label className="input-label">Search by Language</label>
+        <label className="input-label">Language</label>
         <span >
           <select 
             id='language' 

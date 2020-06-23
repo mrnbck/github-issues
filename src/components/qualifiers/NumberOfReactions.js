@@ -2,52 +2,44 @@ import React, { useState, useEffect, createRef } from 'react'
 import PropTypes from 'prop-types'
 import QualifierChecker from '../QualifierChecker'
 
-const Review = ({ 
+const Reactions = ({ 
   qualifiers, 
   setQualifiers,
-  reviewToggle }) => {
+  reactionsToggle }) => {
 
   const [inputField, setInputField] = useState('')
-  const [reviewedBy, setReviewedBy] = useState('')
-  const [reviewRequested, setReviewRequested] = useState('')
-  const [teamReview, setTeamReview] = useState('')
+  const [moreThanSearch, setMoreThanSearch] = useState('')
+  const [lessThanSearch, setLessThenSearch] = useState('')
+  const [rangeSearch, setRangeSearch] = useState('')
   const [inputOnOff, setInputOnOff] = useState('OK')
 
   useEffect(() => {
-    if (reviewToggle === false) {
+    if (reactionsToggle === false) {
       //remove qualifier when untoggled
       let id = 'no filter'
-      let reviewedByRegex = /reviewed-by:([\w])+/        
-      let reviewRequestedRegex = /review-requested:([\w])+/        
-      let teamReviewRegex = /team-review-requested:([\w])+/
-      let reviewRegex = /review:([\w])+/ 
+      let moreThanRegex = /interactions:>([\d])+/        
+      let lessThanRegex = /interactions:<([\d])+/        
+      let rangeRegex = /interactions:([\d])+..[\d]+/
         
-      const findReviewedBy = qualifiers.filter(value => 
-        reviewedByRegex.exec(value))
-      const findReviewRequested = qualifiers.filter(value => 
-        reviewRequestedRegex.exec(value))
-      const findTeamReview = qualifiers.filter(value => 
-        teamReviewRegex.exec(value))
-      const findReview = qualifiers.filter(value => 
-        reviewRegex.exec(value))
-
       //check if any of the qualifiers is used by searching the regex. if true, 
       //the others will result in blank.
-      if (findReviewedBy.length > 0) {
-        QualifierChecker(findReviewedBy, qualifiers, setQualifiers, id)
-      } 
-      if (findReviewRequested.length > 0) {
-        QualifierChecker(findReviewRequested, qualifiers, setQualifiers, id)
-      }
-      if (findTeamReview.length > 0) {
-        QualifierChecker(findTeamReview, qualifiers, setQualifiers, id)
-      }
-      if (findReview.length > 0) {
-        QualifierChecker(findReview, qualifiers, setQualifiers, id)
+      const moreThan = qualifiers.filter(value => moreThanRegex.exec(value))
+      if (moreThan.length > 0) {
+        QualifierChecker(moreThan, qualifiers, setQualifiers, id)
+      } else {
+        const lessThan = qualifiers.filter(value => lessThanRegex.exec(value))
+        if (lessThan.length > 0) {
+          QualifierChecker(lessThan, qualifiers, setQualifiers, id)
+        } else {
+          const range = qualifiers.filter(value => rangeRegex.exec(value))
+          if (range.length > 0) {
+            QualifierChecker(range, qualifiers, setQualifiers, id)
+          }
+        }
       }
     }
     // eslint-disable-next-line
-      },[reviewToggle]) 
+      },[reactionsToggle]) 
 
   //reset input fields when changing the field
   useEffect(() => {
@@ -57,16 +49,18 @@ const Review = ({
 
 
   //use createRef to remember value from input fields
-  let reviewedByRef = createRef()
-  let reviewRequestedRef = createRef()
-  let teamReviewRef = createRef()
+  let moreThanRef = createRef()
+  let lessThanRef = createRef()
+  let rangeRef = createRef()
 
   //check which select option was chosen and save it in a state
   const selectFieldPicker = () => {
 
-    const option = document.getElementById('review').options
+    const option = 
+      document.getElementById('reactions').options
 
-    const id = option[option.selectedIndex].value
+    const id = 
+      option[option.selectedIndex].value
 
     console.log('id', id)
 
@@ -75,14 +69,14 @@ const Review = ({
 
   //track value in input field and save it in the correct state 
   const inputFieldValue = () => {
-    if (reviewedByRef.value) {
-      setReviewedBy(`reviewed-by:${reviewedByRef.value}`)
+    if (moreThanRef.value) {
+      setMoreThanSearch(`reactions:>${moreThanRef.value}`)
     }
-    if (reviewRequestedRef.value) {
-      setReviewRequested(`review-requested:${reviewRequestedRef.value}`)
+    if (lessThanRef.value) {
+      setLessThenSearch(`reactions:<${lessThanRef.value}`)
     }
-    if (teamReviewRef.value) {
-      setTeamReview(`team-review-requested:${teamReviewRef.value}`)
+    if (rangeRef.value) {
+      setRangeSearch(`reactions:${moreThanRef.value}..${rangeRef.value}`)
     }
   }
 
@@ -97,26 +91,14 @@ const Review = ({
 
     let id = ''
     //check which field was used
-    if (teamReview) {
-      id = teamReview
+    if (rangeSearch) {
+      id = rangeSearch
     }
-    if (reviewRequested) {
-      id = reviewRequested
+    if (lessThanSearch) {
+      id = lessThanSearch
     }  
-    if (reviewedBy) {
-      id = reviewedBy
-    }
-    if (inputField === 'review:none') {
-      id = 'review:none'
-    }
-    if (inputField === 'review:required') {
-      id = 'review:required'
-    }
-    if (inputField === 'review:approved') {
-      id = 'review:approved'
-    }
-    if (inputField === 'review:changes_requested') {
-      id = 'review:changes_requested'
+    if (moreThanSearch && !rangeSearch) {
+      id = moreThanSearch
     }
     if (inputField === 'no filter') {
       id = 'no filter'
@@ -125,42 +107,42 @@ const Review = ({
     if (inputOnOff === 'OK' && 
     //only reset when not empty. otherwise it will change every time due to 
     //useEffect()
-    (reviewedBy !== '' || reviewRequested !== '' || teamReview !== '')
+    (moreThanSearch !== '' || lessThanSearch !== '' || rangeSearch !== '')
     ) {
-      if (
-        inputField !== 'no filter' && 
-        inputField !== 'review:none' && 
-        inputField !== 'review:required' &&
-        inputField !== 'review:approved'
-      ) {
+      if (inputField !== 'no filter') {
         document.getElementById('input-field').style.pointerEvents = 'none'
         document.getElementById('input-field').style.backgroundColor='#fdfdfd'
         document.getElementById('input-field').style.color = '#a6a6a6'
         document.getElementById('input-field').style.textTransform='uppercase'
+        if(document.getElementById('range-input')) {
+          document.getElementById('range-input').style.pointerEvents = 'none'
+          document.getElementById('range-input').style.backgroundColor =
+          '#fdfdfd'
+          document.getElementById('range-input').style.color='#a6a6a6'
+          document.getElementById('range-input').style.textTransform =
+          'uppercase'
+        }
         setInputOnOff('RESET') 
       }
     }
 
     //create regex based on value in "id"
-    let reviewedByRegex = /reviewed-by:([\w])+/        
-    let reviewRequestedRegex = /review-requested:([\w])+/        
-    let teamReviewRegex = /team-review-requested:([\w])+/
-    let reviewRegex = /review:([\w])+/ 
+    let moreThanRegex = /reactions:>([\d])+/        
+    let lessThanRegex = /reactions:<([\d])+/        
+    let rangeRegex = /reactions:([\d])+..[\d]+/
 
     //search in qualifiers if current qualifier already exists
     //check all 3 regex since the key is different every time
     const findEntry = qualifiers.filter(value => {
-      if (reviewedByRegex.exec(value)) {
-        return (reviewedByRegex.exec(value))
+      console.log(moreThanRegex.exec(value))
+      if (moreThanRegex.exec(value)) {
+        return (moreThanRegex.exec(value))
       }
-      if (reviewRequestedRegex.exec(value)) {
-        return (reviewRequestedRegex.exec(value))
+      if (lessThanRegex.exec(value)) {
+        return (lessThanRegex.exec(value))
       }
-      if (teamReviewRegex.exec(value)) {
-        return (teamReviewRegex.exec(value))
-      }
-      if (reviewRegex.exec(value)) {
-        return (reviewRegex.exec(value))
+      if (rangeRegex.exec(value)) {
+        return (rangeRegex.exec(value))
       }
       return null
     })
@@ -175,11 +157,19 @@ const Review = ({
         document.getElementById('input-field').style.textTransform = 
           'capitalize'
         document.getElementById('input-field').value = ''
+        if(document.getElementById('range-input')) {
+          document.getElementById('range-input').style.pointerEvents = 'auto'
+          document.getElementById('range-input').style.backgroundColor='white'
+          document.getElementById('range-input').style.color = 'black'
+          document.getElementById('range-input').style.textTransform=
+            'capitalize'
+          document.getElementById('range-input').value = ''
+        }
       }
       setInputOnOff('OK')
-      setReviewedBy('')
-      setReviewRequested('')
-      setTeamReview('')
+      setMoreThanSearch('')
+      setLessThenSearch('')
+      setRangeSearch('')
     }
   }
 
@@ -187,40 +177,47 @@ const Review = ({
   const generateInputField = () => {
   
     switch(inputField) {
-    case 'reviewed-by:USERNAME': 
+    case 'reactions:>n': 
       return <span>
         <form className='searchbar' onSubmit={handleSubmit}><input 
           className='input-field'
           id='input-field'
-          placeholder='Enter Username' 
-          ref={(element) => reviewedByRef = element}
+          placeholder='Enter Number of Reactions' 
+          ref={(element) => moreThanRef = element}
           onChange={inputFieldValue}
         /><button className='OK-button'>{inputOnOff}
         </button>
         </form>
       </span>
-    case 'review-requested:USERNAME': 
+    case 'reactions:<n': 
       return <span>
         <form className='searchbar' onSubmit={handleSubmit}><input 
           className='input-field'
           id='input-field'
-          placeholder='Enter Username'
-          ref={(element) => reviewRequestedRef = element}
+          placeholder='Enter Number of Reactions'
+          ref={(element) => lessThanRef = element}
           onChange={inputFieldValue}
         /><button className='OK-button'>{inputOnOff}
         </button>
         </form>
       </span>
-    case 'team-review-requested:TEAMNAME': 
+    case 'reactions:n..m': 
       return <span>
         <form className='searchbar' onSubmit={handleSubmit}>
           <input 
             className='input-field'
             id='input-field'
-            placeholder='Enter Teamname' 
-            ref={(element) => reviewedByRef = element}
+            placeholder='Enter Number of Reactions' 
+            ref={(element) => moreThanRef = element}
             onChange={inputFieldValue}
           />        
+          <input 
+            className='input-field'
+            id='range-input'
+            placeholder='Enter Number of Reactions' 
+            ref={(element) => rangeRef = element}
+            onChange={inputFieldValue}
+          />
           <button className='OK-button'>{inputOnOff}
           </button>
         </form>
@@ -231,33 +228,25 @@ const Review = ({
 
   }
 
-  if (reviewToggle === false) {
+  if (reactionsToggle === false) {
     return (<div></div>)
   } else
 
     return (
       <div className="form-field">
         <label className="input-label">
-          Review Status and Reviewer
+          Search by Number of Reactions
         </label>
         <span >
           <select 
-            id='review'
+            id='reactions'
             className="picklist" 
             defaultValue='Everywhere'
             onChange={selectFieldPicker}>
             <option value='no filter'>All</option>
-            <option value='review:none'>Not Reviewed</option>
-            <option value='review:required'>Review Required</option>
-            <option value='review:approved'>Review Approved</option>
-            <option value='review:changes_requested'>Changes Requested</option>
-            <option value='reviewed-by:USERNAME'>Reviewed By </option>
-            <option value='review-requested:USERNAME'>Review Requested By
-            </option> 
-            <option value='team-review-requested:TEAMNAME'>
-            Review Requested By Team
-            </option>
-
+            <option value='reactions:>n'>More Than</option>
+            <option value='reactions:<n'>Less Than</option>
+            <option value='reactions:n..m'>Range</option>            
           </select>
         </span>
         {generateInputField()}
@@ -266,9 +255,9 @@ const Review = ({
 
 }
 
-Review.propTypes = {
+Reactions.propTypes = {
   qualifiers: PropTypes.array,
   setQualifiers: PropTypes.func,
 }
 
-export default Review
+export default Reactions

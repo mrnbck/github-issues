@@ -12,6 +12,27 @@ const BranchName = ({
   const [headSearch, setHeadSearch] = useState('')
   const [inputOnOff, setInputOnOff] = useState('OK')
 
+  useEffect(() => {
+    if (branchToggle === false) {
+      //remove qualifier when untoggled
+      let id = 'no filter'
+      let branchRegex = /base:([\w])+/        
+      let headRegex = /head:([\w])+/ 
+        
+      //check if any of the qualifiers is used by searching the regex. if true, 
+      //the others will result in blank.
+      const branchName = qualifiers.filter(value => branchRegex.exec(value))
+      const headBranch = qualifiers.filter(value => headRegex.exec(value))
+      if (branchName.length > 0) {
+        QualifierChecker(branchName, qualifiers, setQualifiers, id)
+      } 
+      if (headBranch.length > 0) {
+        QualifierChecker(headBranch, qualifiers, setQualifiers, id)
+      }
+    }
+    // eslint-disable-next-line
+      },[branchToggle]) 
+
   //reset input fields when changing the field
   useEffect(() => {
     handleInputFields()
@@ -157,7 +178,7 @@ const BranchName = ({
   
     return (
       <div className="form-field">        
-        <label className="input-label">Search by Branch Name</label>
+        <label className="input-label">Branch Name</label>
         <span >
           <select 
             id='branch' 

@@ -1,25 +1,44 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import QualifierChecker from '../QualifierChecker'
 
-const Draft = ({ qualifiers, setQualifiers, mergeToggle }) => {
+const Merged = ({ qualifiers, setQualifiers, mergeToggle }) => {
 
+  useEffect(() => {
+    if (mergeToggle === false) {
+      //remove qualifier when untoggled
+      let id = 'no filter'
+      let mergedRegex = /is:merged/
+      let unmergedRegex = /is:unmerged/
+        
+      const findMerged = qualifiers.filter(value => mergedRegex.exec(value))
+      const findUnmerged = qualifiers.filter(value => unmergedRegex.exec(value))
+      if (findMerged.length > 0) {
+        QualifierChecker(findMerged, qualifiers, setQualifiers, id)
+      } 
+      if (findUnmerged.length > 0) {
+        QualifierChecker(findUnmerged, qualifiers, setQualifiers, id)
+      }
+    }
+    // eslint-disable-next-line
+      },[mergeToggle]) 
+  
   //check if there's already a version of this qualifier in the query. if not, 
   //replace it with the new one.  
-  const draft = () => {
+  const selectFieldPicker = () => {
 
     const option = document.getElementById('merged').options
     const id = option[option.selectedIndex].value
     
-    let merged = /is:merged/
-    let unmerged = /is:unmerged/
+    let mergedRegex = /is:merged/
+    let unmergedRegex = /is:unmerged/
 
     const findEntry = qualifiers.filter(value => {
-      if (merged.exec(value)) {
-        return (merged.exec(value))
+      if (mergedRegex.exec(value)) {
+        return (mergedRegex.exec(value))
       }
-      if (unmerged.exec(value)) {
-        return (unmerged.exec(value))
+      if (unmergedRegex.exec(value)) {
+        return (unmergedRegex.exec(value))
       }
       return null
     })
@@ -38,7 +57,7 @@ const Draft = ({ qualifiers, setQualifiers, mergeToggle }) => {
         <label className="input-label">Merged/Unmerged</label>
         <span >
           <select id='merged' className="picklist" defaultValue='Both' 
-            onChange={draft}>
+            onChange={selectFieldPicker}>
             <option value='no filter'>All</option>
             <option value='is:merged'>Merged</option>
             <option value='is:unmerged'>Unmerged</option>
@@ -49,9 +68,9 @@ const Draft = ({ qualifiers, setQualifiers, mergeToggle }) => {
 
 }
 
-Draft.propTypes = {
+Merged.propTypes = {
   qualifiers: PropTypes.array,
   setQualifiers: PropTypes.func
 }
 
-export default Draft
+export default Merged

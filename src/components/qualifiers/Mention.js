@@ -7,9 +7,23 @@ const Mention = ({
   setQualifiers, 
   mentionToggle }) => {
 
+  useEffect(() => {
+    if (mentionToggle === false) {
+        
+      //remove qualifier when untoggled
+      let id = 'no filter'
+      let regex = /mentions:([\w])+/
+      const findEntry = qualifiers.filter(value => regex.exec(value))
+      if (findEntry.length > 0) {
+        QualifierChecker(findEntry, qualifiers, setQualifiers, id)
+      }
+    }
+    // eslint-disable-next-line
+      },[mentionToggle])
+  
   const [inputField, setInputField] = useState('')
-  const [mentionSearch, setMentionSearch] = useState('')
-  const [mentionInput, setMentionInput] = useState('OK')
+  const [search, setSearch] = useState('')
+  const [inputOnOff, setInputOnOff] = useState('OK')
 
   //reset input fields when changing the field
   useEffect(() => {
@@ -21,18 +35,18 @@ const Mention = ({
   let mentionRef = createRef()
   
   //check which select option was chosen and save it in a state
-  const mention = () => {
+  const selectFieldPicker = () => {
 
-    const mention = document.getElementById('mention').options
-    const id = mention[mention.selectedIndex].value
+    const option = document.getElementById('mention').options
+    const id = option[option.selectedIndex].value
     
     setInputField(id) 
   }
 
   //track value in input field and save it in the correct state 
-  const mentionValue = () => {
+  const inputFieldValue = () => {
     if (mentionRef.value) {
-      setMentionSearch(`mentions:${mentionRef.value}`)
+      setSearch(`mentions:${mentionRef.value}`)
     }
   }
 
@@ -47,17 +61,17 @@ const Mention = ({
  
     let id = ''
     //check which field was used
-    if (mentionSearch) {
-      id = mentionSearch
+    if (search) {
+      id = search
     }
     if (inputField === 'no filter') {
       id = 'no filter'
     }
 
-    if (mentionInput === 'OK' && 
+    if (inputOnOff === 'OK' && 
       //only reset when not empty. otherwise it will change every time due to 
       //useEffect()
-      (mentionSearch !== '')
+      (search !== '')
     ) {
       if (inputField !== 'no filter') {
         document.getElementById('mention-input').style.pointerEvents = 'none'
@@ -66,7 +80,7 @@ const Mention = ({
         document.getElementById('mention-input').style.color = '#a6a6a6'
         document.getElementById('mention-input')
           .style.textTransform='uppercase'
-        setMentionInput('RESET') 
+        setInputOnOff('RESET') 
       }
     }
 
@@ -87,7 +101,7 @@ const Mention = ({
 
     QualifierChecker(findEntry, qualifiers, setQualifiers, id)
 
-    if(mentionInput === 'RESET') {
+    if(inputOnOff === 'RESET') {
       if (inputField !== 'no filter') {
         document.getElementById('assignee-input').style.pointerEvents = 'auto'
         document.getElementById('assignee-input').style.backgroundColor='white'
@@ -96,14 +110,14 @@ const Mention = ({
           'capitalize'
         document.getElementById('assignee-input').value = ''
       }
-      setMentionInput('OK')
-      setMentionSearch('')
+      setInputOnOff('OK')
+      setSearch('')
 
     }
   }
 
   //based on value in select show the correct input fields
-  const mentionInputField = () => {
+  const generateInputField = () => {
     switch(inputField) {
     case 'mentions:USERNAME': 
       return <span>
@@ -112,8 +126,8 @@ const Mention = ({
           id='mention-input'
           placeholder='Enter mentioned username' 
           ref={(element) => mentionRef = element}
-          onChange={mentionValue}
-        /><button className='OK-button'>{mentionInput}
+          onChange={inputFieldValue}
+        /><button className='OK-button'>{inputOnOff}
         </button>
         </form>
       </span>
@@ -129,18 +143,18 @@ const Mention = ({
   
     return (
       <div className="form-field">        
-        <label className="input-label">Search by mention?</label>
+        <label className="input-label">Mention</label>
         <span >
           <select 
             id='mention' 
             className="picklist" 
             defaultValue='Both' 
-            onChange={mention}>
+            onChange={selectFieldPicker}>
             <option value='no filter'>All</option>
             <option value='mentions:USERNAME'>Mentioned Username</option>
           </select>
         </span>
-        {mentionInputField()}
+        {generateInputField()}
       </div>
     )
 

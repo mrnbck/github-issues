@@ -1,9 +1,32 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import QualifierChecker from '../QualifierChecker'
 
 const Locked = ({ qualifiers, setQualifiers, lockedToggle }) => {
 
+  useEffect(() => {
+    if (lockedToggle === false) {
+      
+      //remove qualifier when untoggled
+      let id = 'no filter'
+      let lockedRegex = /is:locked/
+      let unlockedRegex = /is:unlocked/
+      
+      const findLocked = qualifiers.filter(value => 
+        lockedRegex.exec(value))
+      const findUnlocked = qualifiers.filter(value => 
+        unlockedRegex.exec(value))
+
+      if (findLocked.length > 0) {
+        QualifierChecker(findLocked, qualifiers, setQualifiers, id)
+      }
+      if (findUnlocked.length > 0) {
+        QualifierChecker(findUnlocked, qualifiers, setQualifiers, id)
+      }
+    }
+    // eslint-disable-next-line
+    },[lockedToggle])
+  
   //check if there's already a version of this qualifier in the query. if not, 
   //replace it with the new one.  
   const selectFieldPicker = () => {
@@ -11,15 +34,15 @@ const Locked = ({ qualifiers, setQualifiers, lockedToggle }) => {
     const option = document.getElementById('locked').options
     const id = option[option.selectedIndex].value
     
-    let merged = /is:locked/
-    let unmerged = /is:unlocked/
+    let lockedRegex = /is:locked/
+    let unlockedRegex = /is:unlocked/
 
     const findEntry = qualifiers.filter(value => {
-      if (merged.exec(value)) {
-        return (merged.exec(value))
+      if (lockedRegex.exec(value)) {
+        return (lockedRegex.exec(value))
       }
-      if (unmerged.exec(value)) {
-        return (unmerged.exec(value))
+      if (unlockedRegex.exec(value)) {
+        return (unlockedRegex.exec(value))
       }
       return null
     })

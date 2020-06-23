@@ -7,9 +7,23 @@ const Assignee = ({
   setQualifiers, 
   assigneeToggle }) => {
 
+  useEffect(() => {
+    if (assigneeToggle === false) {
+      
+      //remove qualifier when untoggled
+      let id = 'no filter'
+      let regex = /assignee:([\w])+/
+      const findEntry = qualifiers.filter(value => regex.exec(value))
+      if (findEntry.length > 0) {
+        QualifierChecker(findEntry, qualifiers, setQualifiers, id)
+      }
+    }
+    // eslint-disable-next-line
+    },[assigneeToggle])
+
   const [inputField, setInputField] = useState('')
-  const [assigneeSearch, setAssigneeSearch] = useState('')
-  const [assigneeInput, setAssigneeInput] = useState('OK')
+  const [search, setSearch] = useState('')
+  const [inputOnOff, setInputOnOff] = useState('OK')
 
   //reset input fields when changing the field
   useEffect(() => {
@@ -21,18 +35,18 @@ const Assignee = ({
   let assigneeRef = createRef()
   
   //check which select option was chosen and save it in a state
-  const author = () => {
+  const selectFieldPicker = () => {
 
-    const assignee = document.getElementById('assignee').options
-    const id = assignee[assignee.selectedIndex].value
+    const option = document.getElementById('assignee').options
+    const id = option[option.selectedIndex].value
     
     setInputField(id) 
   }
 
   //track value in input field and save it in the correct state 
-  const authorValue = () => {
+  const inputFieldValue = () => {
     if (assigneeRef.value) {
-      setAssigneeSearch(`assignee:${assigneeRef.value}`)
+      setSearch(`assignee:${assigneeRef.value}`)
     }
   }
 
@@ -47,17 +61,17 @@ const Assignee = ({
   
     let id = ''
     //check which field was used
-    if (assigneeSearch) {
-      id = assigneeSearch
+    if (search) {
+      id = search
     }
     if (inputField === 'no filter') {
       id = 'no filter'
     }
 
-    if (assigneeInput === 'OK' && 
+    if (inputOnOff === 'OK' && 
       //only reset when not empty. otherwise it will change every time due to 
       //useEffect()
-      (assigneeSearch !== '')
+      (search !== '')
     ) {
       if (inputField !== 'no filter') {
         document.getElementById('assignee-input').style.pointerEvents = 'none'
@@ -66,7 +80,7 @@ const Assignee = ({
         document.getElementById('assignee-input').style.color = '#a6a6a6'
         document.getElementById('assignee-input')
           .style.textTransform='uppercase'
-        setAssigneeInput('RESET') 
+        setInputOnOff('RESET') 
       }
     }
 
@@ -87,7 +101,7 @@ const Assignee = ({
 
     QualifierChecker(findEntry, qualifiers, setQualifiers, id)
 
-    if(assigneeInput === 'RESET') {
+    if(inputOnOff === 'RESET') {
       if (inputField !== 'no filter') {
         document.getElementById('assignee-input').style.pointerEvents = 'auto'
         document.getElementById('assignee-input').style.backgroundColor='white'
@@ -96,14 +110,14 @@ const Assignee = ({
           'capitalize'
         document.getElementById('assignee-input').value = ''
       }
-      setAssigneeInput('OK')
-      setAssigneeSearch('')
+      setInputOnOff('OK')
+      setSearch('')
 
     }
   }
 
   //based on value in select show the correct input fields
-  const assigneeInputField = () => {
+  const generateInputField = () => {
     switch(inputField) {
     case 'assignee:USERNAME': 
       return <span>
@@ -112,8 +126,8 @@ const Assignee = ({
           id='assignee-input'
           placeholder='Enter Assignee' 
           ref={(element) => assigneeRef = element}
-          onChange={authorValue}
-        /><button className='OK-button'>{assigneeInput}
+          onChange={inputFieldValue}
+        /><button className='OK-button'>{inputOnOff}
         </button>
         </form>
       </span>
@@ -129,18 +143,18 @@ const Assignee = ({
   
     return (
       <div className="form-field">        
-        <label className="input-label">Search by assignee?</label>
+        <label className="input-label">Assignee</label>
         <span >
           <select 
             id='assignee' 
             className="picklist" 
             defaultValue='Both' 
-            onChange={author}>
+            onChange={selectFieldPicker}>
             <option value='no filter'>All</option>
             <option value='assignee:USERNAME'>Assignee</option>
           </select>
         </span>
-        {assigneeInputField()}
+        {generateInputField()}
       </div>
     )
 

@@ -7,6 +7,20 @@ const Involved = ({
   setQualifiers, 
   involvesToggle }) => {
 
+  useEffect(() => {
+    if (involvesToggle === false) {
+        
+      //remove qualifier when untoggled
+      let id = 'no filter'
+      let regex = /involves:([\w])+/
+      const findEntry = qualifiers.filter(value => regex.exec(value))
+      if (findEntry.length > 0) {
+        QualifierChecker(findEntry, qualifiers, setQualifiers, id)
+      }
+    }
+    // eslint-disable-next-line
+      },[involvesToggle])
+
   const [inputField, setInputField] = useState('')
   const [search, setSearch] = useState('')
   const [inputOnOff, setInputOnOff] = useState('OK')
@@ -129,7 +143,7 @@ const Involved = ({
   
     return (
       <div className="form-field">        
-        <label className="input-label">Search by involved user?</label>
+        <label className="input-label">Involved User</label>
         <span >
           <select 
             id='involved' 

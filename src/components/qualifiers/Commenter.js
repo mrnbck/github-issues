@@ -2,14 +2,28 @@ import React, { useState, createRef, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import QualifierChecker from '../QualifierChecker'
 
-const Assignee = ({ 
+const Commenter = ({ 
   qualifiers, 
   setQualifiers, 
   commenterToggle }) => {
 
   const [inputField, setInputField] = useState('')
-  const [commenterSearch, setCommenterSearch] = useState('')
-  const [commenterInput, setCommenterInput] = useState('OK')
+  const [search, setSearch] = useState('')
+  const [inputOnOff, setInputOnOff] = useState('OK')
+
+  useEffect(() => {
+    if (commenterToggle === false) {
+      
+      //remove qualifier when untoggled
+      let id = 'no filter'
+      let regex = /commenter:([\w])+/ 
+      const findEntry = qualifiers.filter(value => regex.exec(value))
+      if (findEntry.length > 0) {
+        QualifierChecker(findEntry, qualifiers, setQualifiers, id)
+      }
+    }
+    // eslint-disable-next-line
+    },[commenterToggle])
 
   //reset input fields when changing the field
   useEffect(() => {
@@ -21,18 +35,18 @@ const Assignee = ({
   let commenterRef = createRef()
   
   //check which select option was chosen and save it in a state
-  const commenter = () => {
+  const selectFieldPicker = () => {
 
-    const commenter = document.getElementById('commenter').options
-    const id = commenter[commenter.selectedIndex].value
+    const option = document.getElementById('commenter').options
+    const id = option[option.selectedIndex].value
     
     setInputField(id) 
   }
 
   //track value in input field and save it in the correct state 
-  const commenterValue = () => {
+  const inputFieldValue = () => {
     if (commenterRef.value) {
-      setCommenterSearch(`commenter:${commenterRef.value}`)
+      setSearch(`commenter:${commenterRef.value}`)
     }
   }
 
@@ -47,17 +61,17 @@ const Assignee = ({
  
     let id = ''
     //check which field was used
-    if (commenterSearch) {
-      id = commenterSearch
+    if (search) {
+      id = search
     }
     if (inputField === 'no filter') {
       id = 'no filter'
     }
 
-    if (commenterInput === 'OK' && 
+    if (inputOnOff === 'OK' && 
       //only reset when not empty. otherwise it will change every time due to 
       //useEffect()
-      (commenterSearch !== '')
+      (search !== '')
     ) {
       if (inputField !== 'no filter') {
         document.getElementById('input-field').style.pointerEvents = 'none'
@@ -66,7 +80,7 @@ const Assignee = ({
         document.getElementById('input-field').style.color = '#a6a6a6'
         document.getElementById('input-field')
           .style.textTransform='uppercase'
-        setCommenterInput('RESET') 
+        setInputOnOff('RESET') 
       }
     }
 
@@ -87,7 +101,7 @@ const Assignee = ({
 
     QualifierChecker(findEntry, qualifiers, setQualifiers, id)
 
-    if(commenterInput === 'RESET') {
+    if(inputOnOff === 'RESET') {
       if (inputField !== 'no filter') {
         document.getElementById('input-field').style.pointerEvents = 'auto'
         document.getElementById('input-field').style.backgroundColor='white'
@@ -96,8 +110,8 @@ const Assignee = ({
           'capitalize'
         document.getElementById('input-field').value = ''
       }
-      setCommenterInput('OK')
-      setCommenterSearch('')
+      setInputOnOff('OK')
+      setSearch('')
 
     }
   }
@@ -112,8 +126,8 @@ const Assignee = ({
           id='input-field'
           placeholder='Enter commenter username' 
           ref={(element) => commenterRef = element}
-          onChange={commenterValue}
-        /><button className='OK-button'>{commenterInput}
+          onChange={inputFieldValue}
+        /><button className='OK-button'>{inputOnOff}
         </button>
         </form>
       </span>
@@ -129,13 +143,13 @@ const Assignee = ({
   
     return (
       <div className="form-field">        
-        <label className="input-label">Search by commenter?</label>
+        <label className="input-label">Commenter</label>
         <span >
           <select 
             id='commenter' 
             className="picklist" 
             defaultValue='Both' 
-            onChange={commenter}>
+            onChange={selectFieldPicker}>
             <option value='no filter'>All</option>
             <option value='commenter:USERNAME'>Commenter</option>
           </select>
@@ -146,10 +160,10 @@ const Assignee = ({
 
 }
 
-Assignee.propTypes = {
+Commenter.propTypes = {
   qualifiers: PropTypes.array,
   setQualifiers: PropTypes.func
 
 }
 
-export default Assignee
+export default Commenter

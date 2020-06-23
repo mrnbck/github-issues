@@ -28,7 +28,7 @@ const IssueOrPr = ({ qualifiers, setQualifiers, issueOrPrToggle }) => {
     let regex = /type:([\w])+/
 
     const findEntry = qualifiers.filter(value => regex.exec(value))
-
+    
     QualifierChecker(findEntry, qualifiers, setQualifiers, id)
   }
 
@@ -45,7 +45,7 @@ const IssueOrPr = ({ qualifiers, setQualifiers, issueOrPrToggle }) => {
           <select id='issueOrPr' className="picklist" defaultValue='Both' 
             onChange={selectFieldPicker}>
             <option value='no filter'>Both</option>
-            <option value='type:issues'>Issues</option>
+            <option value='type:issue'>Issues</option>
             <option value='type:pr'>Pull Requests</option>
           </select>
         </span>

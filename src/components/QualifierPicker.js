@@ -54,31 +54,62 @@ const QualifierPicker = ({
   lockedToggle,
   setLockedToggle,
   metadataToggle,
-  setMetadataToggle
+  setMetadataToggle,
+  labelToggle,
+  setLabelToggle,
+  whenCreatedToggle,
+  setWhenCreatedToggle,
+  whenUpdatedToggle,
+  setWhenUpdatedToggle,
+  whenClosedToggle,
+  setWhenClosedToggle,
+  whenMergedToggle,
+  setWhenMergedToggle,
+  setOpen
 }) => {
 
   const [visible, setVisible] = useState('hidden')
 
+  const pickerOpen = {
+    width: '500px',
+    height: '500px',
+    fontSize: '14px',
+    visibility: 'visible'
+  }
+
+  const pickerClosed = {
+    width: '0',
+    height: '0',
+    fontSize: '0',
+    visibility: 'hidden'
+  }
+
+  const [pickerStyle, setPickerStyle] = useState(pickerClosed)
+  
   const showPicker = () => {
-    document.getElementById('qualifier-picker').style.width = '500px'
-    document.getElementById('qualifier-picker').style.height = '500px'
+    setPickerStyle(pickerOpen)
     document.getElementById('qualifier-container').style.opacity = '80%'
-    document.getElementById('qualifier-picker').style.fontSize = '14px'
-    document.getElementById('qualifier-picker').style.visibility = 'visible'
     document.getElementById('qualifier-container').style.visibility = 'visible'
-    document.body.style.overflow = 'hidden'
+    document.body.style.overflowY = 'hidden'
     setVisible('visible')
   }
 
   const hidePicker = () => {
-    document.getElementById('qualifier-picker').style.visibility = 'hidden'
+    setPickerStyle(pickerClosed)
     document.getElementById('qualifier-container').style.visibility = 'hidden'
-    document.getElementById('qualifier-picker').style.width = '0'
-    document.getElementById('qualifier-picker').style.height = '0'
-    document.getElementById('qualifier-picker').style.fontSize = '0'
     document.getElementById('qualifier-container').style.opacity = '0'
     document.body.style.overflowY = 'auto'
     setVisible('hidden')
+  }
+
+  const closeExtendedSearch = () => {
+    document.getElementById('open-extended').style.maxHeight = '0'
+    document.getElementById('open-extended').style.transition = '0.2s'
+    document.getElementById('extended-search-content').style.top = '-450px'
+    document.getElementById('extended-search-content')
+      .style.transition = '0.5s'
+    //document.getElementById('open-extended-icon').style.rotate = '0deg'
+    setOpen(false)
   }
 
   const toggler = (toggle, setToggle) => {
@@ -164,30 +195,71 @@ const QualifierPicker = ({
       { "name": "Search by Locked/Unlocked",
         "toggle": lockedToggle,
         "setToggle": setLockedToggle },
+      { "name": "Search by Labels",
+        "toggle": labelToggle,
+        "setToggle": setLabelToggle },
       { "name": "Search by Missing Metadata",
         "toggle": metadataToggle,
         "setToggle": setMetadataToggle },
+      { "name": "Search by When Created",
+        "toggle": whenCreatedToggle,
+        "setToggle": setWhenCreatedToggle },
+      { "name": "Search by When Updated",
+        "toggle": whenUpdatedToggle,
+        "setToggle": setWhenUpdatedToggle },
+      { "name": "Search by When Closed",
+        "toggle": whenClosedToggle,
+        "setToggle": setWhenClosedToggle },
+      { "name": "Search by When Merged",
+        "toggle": whenMergedToggle,
+        "setToggle": setWhenMergedToggle },
     ]
+  }
+
+  const [filter, setFilter] = useState('')
+
+  const filterQualifiers = (event) => {
+    event.preventDefault()
+    setFilter(event.target.value)
   }
 
   const qualifierList = () => {
     if (visible === 'visible') {
       return (
         <div>
-          <h3 className='qualifier-list-header'>ADD / REMOVE QUALIFIERS</h3>
-          <span>{JSON_List.qualifiers.map(qualifier => {
+          <div className='picker-top-bar'>
+            <h3 className='qualifier-list-header'>ADD / REMOVE QUALIFIERS</h3>
+            <input 
+              className='picker-search' 
+              placeholder='SEARCH' 
+              onChange={filterQualifiers}></input>
+          </div>
+          {/* I have to filter and map the list in one step. when I save it
+              in a state I get the error "switch from controlled to uncontrolled
+              input component
+              https://reactjs.org/docs/forms.html
+              first filter for qualifier names that include the filter. then go
+              through the resulting list and apply toggler*/}
+          <span>{JSON_List.qualifiers.filter(qualifier => {
+            if (qualifier.name.toLocaleLowerCase()
+              .includes(filter.toLocaleLowerCase())) {
+              return qualifier
+            } return null
+          }).map(qualifier => {
             return (
               <span 
                 className="On-Off-Button" 
                 key={JSON_List.qualifiers.indexOf(qualifier)}>
                 <label className="switch">
-                  <input type="checkbox" onChange={() => {
-                    toggler(
-                      qualifier['toggle'], 
-                      qualifier['setToggle']
-                    )
-                  }} 
-                  checked={qualifier.toggle}/>
+                  <input 
+                    type="checkbox" 
+                    onChange={() => {
+                      toggler(
+                        qualifier['toggle'], 
+                        qualifier['setToggle']
+                      )
+                    }} 
+                    checked={qualifier.toggle}/>
                   <span className="slider round"></span>
                 </label>
                 <div className='qualifier-list'>{qualifier.name}</div>          
@@ -200,9 +272,15 @@ const QualifierPicker = ({
 
   return (
     <div>
-      <div className='plus-button' onClick={showPicker}>+</div>
+      <div className='extended-search-buttons'>
+        <div className='plus-button' onClick={showPicker}>+</div>
+        <button 
+          className='close-button' 
+          onClick={closeExtendedSearch}>Close
+        </button>
+      </div>
       <div id='qualifier-container' onClick={hidePicker}></div>
-      <div id='qualifier-picker'>
+      <div id='qualifier-picker' style={pickerStyle}>
         {qualifierList()}
       </div>
     </div>
@@ -261,7 +339,18 @@ QualifierPicker.propTypes = {
   lockedToggle:PropTypes.bool,
   setLockedToggle:PropTypes.func,
   metadataToggle:PropTypes.bool,
-  setMetadataToggle:PropTypes.func
+  setMetadataToggle:PropTypes.func,
+  setOpen:PropTypes.func,
+  labelToggle:PropTypes.bool,
+  setLabelToggle:PropTypes.func,
+  whenCreatedToggle:PropTypes.bool,
+  setWhenCreatedToggle:PropTypes.func,
+  whenUpdatedToggle:PropTypes.bool,
+  setWhenUpdatedToggle:PropTypes.func,
+  whenClosedToggle:PropTypes.bool,
+  setWhenClosedToggle:PropTypes.func,
+  whenMergedToggle:PropTypes.bool,
+  setWhenMergedToggle:PropTypes.func
 }
 
 export default QualifierPicker

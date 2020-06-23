@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import QualifierChecker from '../QualifierChecker'
 
@@ -7,10 +7,24 @@ const PublicOrPrivate = ({
   setQualifiers, 
   publicOrPrivateToggle }) => {
 
-  const publicOrPrivate = () => {
+  useEffect(() => {
+    if (publicOrPrivateToggle === false) {
+        
+      //remove qualifier when untoggled
+      let id = 'no filter'
+      let regex = /\+is:([\w])+/
+      const findEntry = qualifiers.filter(value => regex.exec(value))
+      if (findEntry.length > 0) {
+        QualifierChecker(findEntry, qualifiers, setQualifiers, id)
+      }
+    }
+    // eslint-disable-next-line
+      },[publicOrPrivateToggle])
+    
+  const selectFieldPicker = () => {
 
-    const publicOrPrivate = document.getElementById('publicOrPrivate').options
-    const id = publicOrPrivate[publicOrPrivate.selectedIndex].value
+    const option = document.getElementById('publicOrPrivate').options
+    const id = option[option.selectedIndex].value
     
     let regex = /\+is:([\w])+/
 
@@ -27,10 +41,10 @@ const PublicOrPrivate = ({
   
     return (
       <div className="form-field">        
-        <label className="input-label">Public Or Private?</label>
+        <label className="input-label">Public Or Private</label>
         <span >
           <select id='publicOrPrivate' className="picklist" defaultValue='Both' 
-            onChange={publicOrPrivate}>
+            onChange={selectFieldPicker}>
             <option value='no filter'>Both</option>
             <option value='is:public'>Public</option>
             <option value='is:private'>Private</option>

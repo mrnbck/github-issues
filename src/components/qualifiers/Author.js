@@ -7,10 +7,32 @@ const Author = ({
   setQualifiers, 
   authorToggle }) => {
 
+  useEffect(() => {
+    if (authorToggle === false) {
+        
+      //remove qualifier when untoggled
+      let id = 'no filter'
+      let authorRegex = /author:([\w])+/        
+      let intAccountRegex = /author:app\/([\w])+/ 
+        
+      const findAuthor = qualifiers.filter(value => authorRegex.exec(value))
+      if (findAuthor.length > 0) {
+        QualifierChecker(findAuthor, qualifiers, setQualifiers, id)
+      } else {
+        const intAccount = qualifiers.filter(value => 
+          intAccountRegex.exec(value))
+        if (intAccount.length > 0) {
+          QualifierChecker(intAccount, qualifiers, setQualifiers, id)
+        }
+      }
+    }
+    // eslint-disable-next-line
+      },[authorToggle])  
+  
   const [inputField, setInputField] = useState('')
   const [authorSearch, setAuthorSearch] = useState('')
   const [intAccountSearch, setIntAccountSearch] = useState('')
-  const [authorInput, setAuthorInput] = useState('OK')
+  const [inputOnOff, setInputOnOff] = useState('OK')
 
   //reset input fields when changing the field
   useEffect(() => {
@@ -23,16 +45,16 @@ const Author = ({
   let intAccountRef = createRef()
 
   //check which select option was chosen and save it in a state
-  const author = () => {
+  const selectFieldPicker = () => {
 
-    const author = document.getElementById('author').options
-    const id = author[author.selectedIndex].value
+    const option = document.getElementById('author').options
+    const id = option[option.selectedIndex].value
     
     setInputField(id) 
   }
 
   //track value in input field and save it in the correct state 
-  const authorValue = () => {
+  const inputFieldValue = () => {
     if (authorRef.value) {
       setAuthorSearch(`author:${authorRef.value}`)
     }
@@ -62,7 +84,7 @@ const Author = ({
       id = 'no filter'
     }
 
-    if (authorInput === 'OK' && 
+    if (inputOnOff === 'OK' && 
       //only reset when not empty. otherwise it will change every time due to 
       //useEffect()
       (authorSearch !== '' || intAccountSearch !== '')
@@ -72,7 +94,7 @@ const Author = ({
         document.getElementById('author-input').style.backgroundColor='#fdfdfd'
         document.getElementById('author-input').style.color = '#a6a6a6'
         document.getElementById('author-input').style.textTransform='uppercase'
-        setAuthorInput('RESET') 
+        setInputOnOff('RESET') 
       }
     }
 
@@ -95,7 +117,7 @@ const Author = ({
 
     QualifierChecker(findEntry, qualifiers, setQualifiers, id)
 
-    if(authorInput === 'RESET') {
+    if(inputOnOff === 'RESET') {
       if (inputField !== 'no filter') {
         document.getElementById('author-input').style.pointerEvents = 'auto'
         document.getElementById('author-input').style.backgroundColor = 'white'
@@ -104,14 +126,14 @@ const Author = ({
           'capitalize'
         document.getElementById('author-input').value = ''
       }
-      setAuthorInput('OK')
+      setInputOnOff('OK')
       setAuthorSearch('')
 
     }
   }
 
   //based on value in select show the correct input fields
-  const authorInputField = () => {
+  const generateInputField = () => {
     switch(inputField) {
     case 'author:USERNAME': 
       return <span>
@@ -120,8 +142,8 @@ const Author = ({
           id='author-input'
           placeholder='Enter Author' 
           ref={(element) => authorRef = element}
-          onChange={authorValue}
-        /><button id='author-input-button' className='OK-button'>{authorInput}
+          onChange={inputFieldValue}
+        /><button id='author-input-button' className='OK-button'>{inputOnOff}
         </button>
         </form>
       </span>
@@ -132,8 +154,8 @@ const Author = ({
           id='author-input'
           placeholder='Enter Integration Account'
           ref={(element) => intAccountRef = element}
-          onChange={authorValue}
-        /><button className='OK-button'>{authorInput}
+          onChange={inputFieldValue}
+        /><button className='OK-button'>{inputOnOff}
         </button>
         </form>
       </span>
@@ -149,19 +171,19 @@ const Author = ({
   
     return (
       <div className="form-field">        
-        <label className="input-label">Search by author?</label>
+        <label className="input-label">Author</label>
         <span >
           <select 
             id='author' 
             className="picklist" 
             defaultValue='Both' 
-            onChange={author}>
+            onChange={selectFieldPicker}>
             <option value='no filter'>All</option>
             <option value='author:USERNAME'>Author</option>
             <option value='author:app/USERNAME'>Integration Account</option>
           </select>
         </span>
-        {authorInputField()}
+        {generateInputField()}
       </div>
     )
 

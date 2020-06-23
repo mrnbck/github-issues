@@ -11,6 +11,20 @@ const TeamMention = ({
   const [search, setSearch] = useState('')
   const [inputOnOff, setInputOnOff] = useState('OK')
 
+  useEffect(() => {
+    if (teamMentionToggle === false) {
+      
+      //remove qualifier when untoggled
+      let id = 'no filter'
+      let regex = /team:([\w])+\/[\w]+/ 
+      const findEntry = qualifiers.filter(value => regex.exec(value))
+      if (findEntry.length > 0) {
+        QualifierChecker(findEntry, qualifiers, setQualifiers, id)
+      }
+    }
+    // eslint-disable-next-line
+    },[teamMentionToggle])
+
   //reset input fields when changing the field
   useEffect(() => {
     handleInputFields()
@@ -152,7 +166,7 @@ const TeamMention = ({
   
     return (
       <div className="form-field">        
-        <label className="input-label">Search by team mention?</label>
+        <label className="input-label">Team Mention</label>
         <span >
           <select 
             id='teamMention' 

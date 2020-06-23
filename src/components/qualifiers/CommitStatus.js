@@ -1,12 +1,26 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import QualifierChecker from '../QualifierChecker'
 
 const CommitStatus = ({ qualifiers, setQualifiers, commitStatusToggle }) => {
 
+  useEffect(() => {
+    if (commitStatusToggle === false) {
+      
+      //remove qualifier when untoggled
+      let id = 'no filter'
+      let regex = /\+status:([\w])+/
+      const findEntry = qualifiers.filter(value => regex.exec(value))
+      if (findEntry.length > 0) {
+        QualifierChecker(findEntry, qualifiers, setQualifiers, id)
+      }
+    }
+    // eslint-disable-next-line
+    },[commitStatusToggle])
+  
   //check if there's already a version of this qualifier in the query. if not, 
   //replace it with the new one.  
-  const optionPicker = () => {
+  const selectFieldPicker = () => {
 
     const option = document.getElementById('commitStatus').options
     const id = option[option.selectedIndex].value
@@ -34,7 +48,7 @@ const CommitStatus = ({ qualifiers, setQualifiers, commitStatusToggle }) => {
         <label className="input-label">Commit Status</label>
         <span >
           <select id='commitStatus' className="picklist" defaultValue='Both' 
-            onChange={optionPicker}>
+            onChange={selectFieldPicker}>
             <option value='no filter'>All</option>
             <option value='status:pending'>Pending</option>
             <option value='status:success'>Success</option>

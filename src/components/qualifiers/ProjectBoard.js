@@ -12,6 +12,25 @@ const ProjectBoard = ({
   const [repoSearch, setRepoSearch] = useState('')
   const [inputOnOff, setInputOnOff] = useState('OK')
 
+  useEffect(() => {
+    if (projectBoardToggle === false) {
+      //remove qualifier when untoggled
+      let id = 'no filter'
+      let repoRegex = /project:([\w])+\/[\w]+/
+      let boardRegex = /project:([\w])+/  
+        
+      const findRepo = qualifiers.filter(value => repoRegex.exec(value))
+      const findBoard = qualifiers.filter(value => boardRegex.exec(value))
+      if (findRepo.length > 0) {
+        QualifierChecker(findRepo, qualifiers, setQualifiers, id)
+      } 
+      if (findBoard.length > 0) {
+        QualifierChecker(findBoard, qualifiers, setQualifiers, id)
+      }
+    }
+    // eslint-disable-next-line
+      },[projectBoardToggle]) 
+
   //reset input fields when changing the field
   useEffect(() => {
     handleInputFields()
@@ -180,7 +199,7 @@ const ProjectBoard = ({
   
     return (
       <div className="form-field">        
-        <label className="input-label">Search by Project Board?</label>
+        <label className="input-label">Project Board</label>
         <span >
           <select 
             id='projectBoard' 
