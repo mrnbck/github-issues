@@ -1,40 +1,40 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import IssueOrPr from './qualifiers/IssueOrPr'
-import TitleBodyComment from './qualifiers/TitleBodyComment'
-import UserOrOrganization from './qualifiers/UserOrOrganization'
-import OpenOrClosed from './qualifiers/OpenOrClosed'
+import IssueOrPr from './fixed-qualifiers/IssueOrPr'
+import TitleBodyComment from './fixed-qualifiers/TitleBodyComment'
+import UserOrOrganization from './input-qualifiers/UserOrOrganization'
+import OpenOrClosed from './fixed-qualifiers/OpenOrClosed'
 import QualifierPicker from './QualifierPicker'
-import PublicOrPrivate from './qualifiers/PublicOrPrivate'
-import Author from './qualifiers/Author'
-import Assignee from './qualifiers/Assignee'
-import Mention from './qualifiers/Mention'
-import TeamMention from './qualifiers/TeamMention'
-import Commenter from './qualifiers/Commenter'
-import Involved from './qualifiers/Involved'
-import Linked from './qualifiers/Linked'
-import Milestone from './qualifiers/Milestone'
-import ProjectBoard from './qualifiers/ProjectBoard'
-import CommitStatus from './qualifiers/CommitStatus'
-import BranchName from './qualifiers/BranchName'
-import Language from './qualifiers/Language'
-import NumberOfComments from './qualifiers/NumberOfComments'
-import NumberOfInteractions from './qualifiers/NumberOfInteractions'
-import NumberOfReactions from './qualifiers/NumberOfReactions'
-import Draft from './qualifiers/Draft'
-import Review from './qualifiers/Review'
-import Merge from './qualifiers/Merged'
-import Archived from './qualifiers/Archived'
-import Locked from './qualifiers/Locked'
-import Metadata from './qualifiers/Metadata'
-import Label from './qualifiers/Label'
-import WhenCreated from './qualifiers/WhenCreated'
-import WhenUpdated from './qualifiers/WhenUpdated'
-import WhenClosed from './qualifiers/WhenClosed'
-import WhenMerged from './qualifiers/WhenMerged'
+import PublicOrPrivate from './fixed-qualifiers/PublicOrPrivate'
+import Author from './fixed-qualifiers/Author'
+import Assignee from './fixed-qualifiers/Assignee'
+import Mention from './fixed-qualifiers/Mention'
+import TeamMention from './fixed-qualifiers/TeamMention'
+import Commenter from './fixed-qualifiers/Commenter'
+import Involved from './fixed-qualifiers/Involved'
+import Linked from './fixed-qualifiers/Linked'
+import Milestone from './fixed-qualifiers/Milestone'
+import ProjectBoard from './fixed-qualifiers/ProjectBoard'
+import CommitStatus from './fixed-qualifiers/CommitStatus'
+import BranchName from './fixed-qualifiers/BranchName'
+import Language from './fixed-qualifiers/Language'
+import NumberOfComments from './fixed-qualifiers/NumberOfComments'
+import NumberOfInteractions from './fixed-qualifiers/NumberOfInteractions'
+import NumberOfReactions from './fixed-qualifiers/NumberOfReactions'
+import Draft from './fixed-qualifiers/Draft'
+import Review from './fixed-qualifiers/Review'
+import Merge from './fixed-qualifiers/Merged'
+import Archived from './fixed-qualifiers/Archived'
+import Locked from './fixed-qualifiers/Locked'
+import Metadata from './fixed-qualifiers/Metadata'
+import Label from './fixed-qualifiers/Label'
+import WhenCreated from './fixed-qualifiers/WhenCreated'
+import WhenUpdated from './fixed-qualifiers/WhenUpdated'
+import WhenClosed from './fixed-qualifiers/WhenClosed'
+import WhenMerged from './fixed-qualifiers/WhenMerged'
 
 const ExtendedSearch = ({ 
-  qualifiers, setQualifiers,
+  qualifiers, setQualifiers, setMyIssues,
   baseUrl,filter, currentPage, setUrl, setOpen }) => {
 
   const [issueOrPrToggle, setIssueOrPrToggle] = useState(true)
@@ -69,6 +69,22 @@ const ExtendedSearch = ({
   const [whenClosedToggle, setWhenClosedToggle] = useState(false)
   const [whenMergedToggle, setWhenMergedToggle] = useState(false)
 
+  const inputOK = {
+    pointerEvents: 'auto',
+    backgroundColor: 'white',
+    color: 'black',
+    textTransform: 'capitalize'
+  }
+  
+  const inputReset = {    
+    pointerEvents: 'none',
+    backgroundColor: '#fdfdfd',
+    color: '#a6a6a6',
+    textTransform: 'uppercase' 
+  }
+
+  const [inputStyle, setInputStyle] = useState(inputOK)
+
   //reload every time qualifiers change
   useEffect(() => {
     if (qualifiers.length > 0 && filter !== '') {
@@ -102,6 +118,11 @@ const ExtendedSearch = ({
         qualifiers={qualifiers} 
         setQualifiers={setQualifiers}
         userOrOrgToggle={userOrOrgToggle}
+        inputStyle={inputStyle}
+        setInputStyle={setInputStyle}
+        inputOK={inputOK}
+        inputReset={inputReset}
+        setMyIssues={setMyIssues} 
       />
 
       <OpenOrClosed
@@ -240,6 +261,7 @@ const ExtendedSearch = ({
         qualifiers={qualifiers}
         setQualifiers={setQualifiers}
         labelToggle={labelToggle}
+        setMyIssues={setMyIssues} 
       />
 
       <Metadata
@@ -351,7 +373,9 @@ ExtendedSearch.propTypes = {
   filter: PropTypes.string,
   currentPage: PropTypes.string,
   setUrl: PropTypes.func,
-  setOpen: PropTypes.func
+  setOpen: PropTypes.func,
+  setLogin: PropTypes.func,
+  setMyIssues: PropTypes.func
 }
 
 export default ExtendedSearch

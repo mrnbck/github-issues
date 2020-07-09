@@ -1,5 +1,7 @@
-import React from 'react'
+import React, { useState } from 'react'
 import IssueList from './IssueList'
+import OpenIssue from './OpenIssue'
+import MyIssues from './MyIssues'
 import { 
   BrowserRouter as Router, Route, Link } from 'react-router-dom'
 
@@ -8,18 +10,19 @@ const Navigation = ({
   totalCount, 
   currentPage, 
   issues, 
-  paginationLinks,
   setUrl,
+  url,
   setCurrentPage,
   qualifiers,
   showIssue,
-  setShowIssue }) => {
+  setShowIssue,
+  myIssues }) => {
 
-  
+  const [issue, setIssue] = useState({})
+
   //only show pagination when there are search results, i.e. a search term 
   //has been entered
   if ((filter !== '' || qualifiers !== '') && totalCount > 0) {
-    //console.log('totalCount',totalCount)
     let last = 0
     if (totalCount > 1000) {
       last = Math.floor(1000/30)+1
@@ -34,27 +37,47 @@ const Navigation = ({
         return ('pagination active')
       }
       else return ('pagination')
-      
     }
 
     return (
       <div>
         <span>
           <Router>
-            <Route path={'/issues/:currentPage'} 
+            <Route exact path={'/my-issues/:currentPage'} 
+              render={() => 
+                <MyIssues 
+                  setShowIssue={setShowIssue}
+                  issues={issues}
+                  setIssue={setIssue}
+                />}
+            />
+            <Route exact path={'/issues/id/:id'}
+              render={() => 
+                <OpenIssue 
+                  showIssue={showIssue}
+                  setShowIssue={setShowIssue}
+                  issue={issue}
+                  setIssue={setIssue} 
+                  currentPage={currentPage} 
+                  myIssues={myIssues}  
+                />}
+            />
+            <Route exact path={'/issues/:currentPage'} 
               render={({ match }) => 
                 <IssueList 
                   showIssue={showIssue}
                   setShowIssue={setShowIssue}
                   issues={issues}
-                  paginationLinks={paginationLinks}
                   page={match.params.currentPage}
+                  url={url}
                   setUrl={setUrl}
                   currentPage={currentPage}
                   setCurrentPage={setCurrentPage}
+                  issue={issue}
+                  setIssue={setIssue}
                 />}
             />
-            {//hide pagination while an issue is open
+            {//hide pagination and issuelist while an issue is open
               showIssue ? '' : (
               // pagination on mobile
                 window.innerWidth <= 600 ?

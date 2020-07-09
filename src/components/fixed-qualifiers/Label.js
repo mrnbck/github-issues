@@ -5,7 +5,8 @@ import QualifierChecker from '../QualifierChecker'
 const UserOrOrganization = ({ 
   qualifiers, 
   setQualifiers,
-  labelToggle }) => {
+  labelToggle,
+  setMyIssues }) => {
 
   const [inputField, setInputField] = useState('')
   const [oneLabelSearch, setOneLabelSearch] = useState('')
@@ -24,7 +25,7 @@ const UserOrOrganization = ({
       const findUser = qualifiers.filter(value => oneLabelRegex.exec(value))
 
       if (findUser.length > 0) {
-        QualifierChecker(findUser, qualifiers, setQualifiers, id)
+        QualifierChecker(findUser, qualifiers, setQualifiers, id, setMyIssues)
       } 
     }
     // eslint-disable-next-line
@@ -143,7 +144,7 @@ const UserOrOrganization = ({
       return null
     })
 
-    QualifierChecker(findEntry, qualifiers, setQualifiers, id)
+    QualifierChecker(findEntry, qualifiers, setQualifiers, id, setMyIssues)
       
     if(inputOnOff === 'RESET') {
       if (inputField !== 'no filter') {
@@ -282,7 +283,7 @@ const UserOrOrganization = ({
 UserOrOrganization.propTypes = {
   qualifiers: PropTypes.array,
   setQualifiers: PropTypes.func,
-  userOrOrgToggle: PropTypes.bool,
+  setMyIssues: PropTypes.func
 }
 
 export default UserOrOrganization

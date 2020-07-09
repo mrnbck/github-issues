@@ -2,13 +2,14 @@ const QualifierChecker = (
   findEntry, 
   qualifiers, 
   setQualifiers, 
-  id ) => {
+  id,
+  setMyIssues ) => {
 
   const helper = findEntry[0]
   let newQualifiers = []
   
   if (helper) {
-    console.log('qualifiers:',qualifiers[0], 'regex:', helper)
+    //console.log('qualifiers:',qualifiers[0], 'regex:', helper)
   
     if (qualifiers.includes(helper)) {
       //if qualifiers is already used, get existing qualifiers up until
@@ -31,9 +32,11 @@ const QualifierChecker = (
           newQualifiers.push(`+${id}`)
         console.log('after adding new qualifier', newQualifiers)
       }
+      setMyIssues(false)
       setQualifiers(newQualifiers)}
   } else {
     if (id !== '' && 'no filter') {
+      setMyIssues(false)
       qualifiers.length === 0 ?
         setQualifiers(qualifiers.concat(`${id}`)) : 
         setQualifiers(qualifiers.concat(`+${id}`))      

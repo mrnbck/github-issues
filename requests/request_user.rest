@@ -1,0 +1,1 @@
+GET https://github.com/login/oauth/authorize?client_id=6991147f1b0d05d48317
