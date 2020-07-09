@@ -4,6 +4,8 @@ import { useHistory } from 'react-router-dom'
 import axios from 'axios'
 import ReactMarkdown from 'react-markdown'
 import '@fortawesome/fontawesome-free/css/all.css'
+import { 
+  BrowserRouter as Router, Link } from 'react-router-dom'
 
 const OpenIssue = ({ 
   issue, showIssue, setShowIssue, 
@@ -428,6 +430,20 @@ const OpenIssue = ({
       event.preventDefault()
       setNewComment(event.target.value)
     }
+
+    const handleLogin = async (event) => {
+      event.preventDefault()
+      const response = await fetch('http://localhost:3001/login')
+      const url = await response.text()
+  
+      /*window.open(url,
+        'Github Login',
+        'menubar=no,location=no,resizable=no,'+
+        'scrollbars=no,status=no,width=700,'+
+        'height=726'
+      )*/
+      window.location.assign(url)
+    }
      
     return (
       <div>
@@ -456,8 +472,17 @@ const OpenIssue = ({
               //if the user is not logged in yet, show Login button
                 <div className='containers'>
                   <span>To comment please login to GitHub first</span>
-                  <button style={styleLoginButton} className='close-button'>
-              Login</button>
+                  <Router>
+                    <Link to='/login'>        
+                      <button 
+                        style={styleLoginButton} 
+                        className='close-button'
+                        onClick={handleLogin}>Login
+                      </button>
+                    </Link>
+                  </Router>
+                  
+
                 </div>) :
               //if user is logged in show comment box.
                 (<div className='comments-container'>
