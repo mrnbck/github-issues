@@ -5,7 +5,12 @@ import QualifierChecker from '../QualifierChecker'
 const Assignee = ({ 
   qualifiers, 
   setQualifiers, 
-  assigneeToggle }) => {
+  assigneeToggle,
+  inputStyle,
+  setInputStyle, 
+  inputOK,
+  inputReset,
+  setMyIssues }) => {
 
   useEffect(() => {
     if (assigneeToggle === false) {
@@ -74,14 +79,18 @@ const Assignee = ({
       (search !== '')
     ) {
       if (inputField !== 'no filter') {
-        document.getElementById('assignee-input').style.pointerEvents = 'none'
-        document.getElementById('assignee-input')
-          .style.backgroundColor='#fdfdfd'
-        document.getElementById('assignee-input').style.color = '#a6a6a6'
-        document.getElementById('assignee-input')
-          .style.textTransform='uppercase'
+        setInputStyle(inputReset)
         setInputOnOff('RESET') 
       }
+    }
+
+    if(inputOnOff === 'RESET') {
+      if (inputField !== 'no filter') {
+        setInputStyle(inputOK)
+      }
+      setInputOnOff('OK')
+      setSearch('')
+
     }
 
     //create regex based on value in "id"
@@ -99,21 +108,9 @@ const Assignee = ({
     })
 
 
-    QualifierChecker(findEntry, qualifiers, setQualifiers, id)
+    QualifierChecker(findEntry, qualifiers, setQualifiers, id, setMyIssues)
 
-    if(inputOnOff === 'RESET') {
-      if (inputField !== 'no filter') {
-        document.getElementById('assignee-input').style.pointerEvents = 'auto'
-        document.getElementById('assignee-input').style.backgroundColor='white'
-        document.getElementById('assignee-input').style.color = 'black'
-        document.getElementById('assignee-input').style.textTransform = 
-          'capitalize'
-        document.getElementById('assignee-input').value = ''
-      }
-      setInputOnOff('OK')
-      setSearch('')
 
-    }
   }
 
   //based on value in select show the correct input fields
@@ -124,10 +121,11 @@ const Assignee = ({
         <form className='searchbar' onSubmit={handleSubmit}><input 
           className='input-field'
           id='assignee-input'
-          placeholder='Enter Assignee' 
+          placeholder='Enter Assignee'
+          style={inputStyle} 
           ref={(element) => assigneeRef = element}
           onChange={inputFieldValue}
-        /><button className='OK-button'>{inputOnOff}
+        /><button className='button OK-button'>{inputOnOff}
         </button>
         </form>
       </span>

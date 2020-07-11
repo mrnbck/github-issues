@@ -4,7 +4,7 @@ const bodyParser = require('body-parser')
 const axios = require('axios')
 const cors = require('cors')
 const app = express()
-
+app.use(express.static('build'))
 app.use(bodyParser.json())
 
 var corsOptions = {
@@ -15,7 +15,7 @@ var corsOptions = {
 
 app.use(cors(corsOptions))
 
-app.get('/login', async (req, res) => {
+app.get('/api/login', async (req, res) => {
   // eslint-disable-next-line no-unused-vars
 
   const client = process.env.CLIENT
@@ -30,7 +30,7 @@ app.get('/login', async (req, res) => {
 })
 
 // eslint-disable-next-line no-unused-vars
-app.get('/oauth-token/:code/:state', async (req, res) => {
+app.get('/api/oauth-token/:code/:state', async (req, res) => {
   
   //console.log(req.params.code)
 
@@ -42,23 +42,29 @@ app.get('/oauth-token/:code/:state', async (req, res) => {
     const url = 'https://github.com/login/oauth/access_token' 
     const fullUrl = `${url}?${client}&${secret}&code=${req.params.code}`
   
-    const result = await axios.post(fullUrl)
-    console.log(result.status, ': ', result.statusText)
-    const token = result.data.match(/access_token=([^&]+)/)[1]
+    try {
+      const result = await axios.post(fullUrl)
+      console.log(result.status, ': ', result.statusText)
+      const token = result.data.match(/access_token=([^&]+)/)[1]
   
-    res.cookie('user_session', token, 
-      { httpOnly: true, path: '/', secure: true, sameSite: 'lax' })
-    //res.setHeader('Set-Cookie', 
-    //  [`user_session=${token}; Path=/; secure; HttpOnly; SameSite=Lax`])
-    res.setHeader('Access-Control-Allow-Credentials', true)
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000')
+      res.cookie('user_session', token, 
+        { httpOnly: true, path: '/', secure: true, sameSite: 'lax' })
+      //res.setHeader('Set-Cookie', 
+      //  [`user_session=${token}; Path=/; secure; HttpOnly; SameSite=Lax`])
+      res.setHeader('Access-Control-Allow-Credentials', true)
+      res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000')
 
-    res.send(token)
+      res.send(token)
+    } 
+    catch (error) {
+      console.log(error)
+      res.sendStatus(error.response.status)
+    }
   }
   else return res.sendStatus(403)
 })
 
-app.get('/issues/:query', async (req, res) => {
+app.get('/api/issues/:query', async (req, res) => {
   const query = req.params.query
   const url = 'https://api.github.com/search/issues?q='
   const fullUrl = url + query
@@ -70,54 +76,98 @@ app.get('/issues/:query', async (req, res) => {
     const config = {
       headers: { authorization: 'token ' + user_session },
     }
-    const result = await axios.get(fullUrl, config)
-    //console.log('headers', result.headers)
-    //console.log('data', result.data)
+    try {
+      const result = await axios.get(fullUrl, config)
+      //console.log('headers', result.headers)
+      //console.log('data', result.data)
 
-    const data = result.data
-    res.setHeader('Access-Control-Allow-Credentials', true)
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000')
-    res.status(200)
-    res.send(data)
+      const data = result.data
+      console.log('Rate Limit remaining', 
+        result.headers['x-ratelimit-remaining'])
+      res.setHeader('Access-Control-Allow-Credentials', true)
+      res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000')
+      res.status(200)
+      res.send(data)
+    } 
+    catch (error) {
+      console.log(error)
+      res.sendStatus(error.response.status)
+    }
   }
   else {
-    const result = await axios.get(fullUrl)
-    const data = result.data
-    res.status(200)
-    res.send(data)
+    try {
+      const result = await axios.get(fullUrl)
+      const data = result.data
+      res.status(200)
+      res.send(data)
+    } 
+    catch (error) {
+      console.log(error)
+      res.sendStatus(error.response.status)
+    }
   }  
 })
 
-app.get('/my-issues/:id', async (req, res) => {
+app.get('/api/my-issues/:id', async (req, res) => {
   const regex=/user_session=([^;]+)/
-  const user_session = req.headers.cookie.match(regex)[1]
+  if(req.headers.cookie) {
+    const user_session = req.headers.cookie.match(regex)[1]
 
-  const config = {
-    headers: { authorization: 'token ' + user_session },
+    const config = {
+      headers: { authorization: 'token ' + user_session },
+    }
+
+    try {
+      const myIssues = await axios.get('https://api.github.com/issues', config)
+      const data = myIssues.data
+
+      data.length > 0 ? res.status(200) : res.status(404)
+      res.status(200)
+      res.send(data) 
+    } catch(error) {
+      console.log('My Issues', error.response.status, '-', 
+        error.response.statusText)
+
+      res.send(error.error)
+    }
+
+
+  } else {
+    try {
+      const myIssues = await axios.get('https://api.github.com/issues')
+      const data = myIssues.data
+      data.length > 0 ? res.status(200) : res.status(404)
+      res.send(data)
+    } catch(error) {
+      console.log(error.response.status, '-', error.response.statusText)
+      if (error.response.status === 404) {
+        res.sendStatus(204)
+      } else
+        res.sendStatus(error.response.status)
+    }
   }
 
-  const myIssues = await axios.get('https://api.github.com/issues', config)
-  const data = myIssues.data
-
-  res.status(200)
-  res.send(data) 
 })
 
-app.get('/checkLogin', async (req, res) => {
+app.get('/api/checkLogin', async (req, res) => {
   
   const regex=/user_session=([^;]+)/
-  const user_session = req.headers.cookie.match(regex)[1]
 
-  //no longer needed because I set it globally?
-  res.setHeader('Access-Control-Allow-Credentials', true)
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000')
+  if(req.headers.cookie) {
+    const user_session = req.headers.cookie.match(regex)[1]
 
-  if (user_session) {
-    res.send('true')
-  } else res.send('false') 
+    //no longer needed because I set it globally?
+    //res.setHeader('Access-Control-Allow-Credentials', true)
+    //res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000')
+
+    if (user_session) {
+      res.send('true')
+    } else res.send('false') }
+
+  else res.send('false')
 })
 
-app.get('/user', async (req, res) => {
+app.get('/api/user', async (req, res) => {
 
   const regex=/user_session=([^;]+)/
   const user_session = req.headers.cookie.match(regex)[1]
@@ -133,11 +183,11 @@ app.get('/user', async (req, res) => {
     res.send(data.login) 
   } catch(error) {
     console.log(error)
-    res.sendStatus(400)
+    res.sendStatus(error.response.status)
   }
 })
 
-app.post('/repos/:owner/:repo/issues/:id/comments', async (req,res) => {
+app.post('/api/repos/:owner/:repo/issues/:id/comments', async (req,res) => {
   const owner = req.params.owner
   const repo = req.params.repo
   const id = req.params.id
@@ -148,6 +198,8 @@ app.post('/repos/:owner/:repo/issues/:id/comments', async (req,res) => {
   const config = {
     headers: { authorization: 'token ' + user_session },
   }
+
+  console.log(req.body)
 
   try {
     await axios.post('https://api.github.com/repos/'+
@@ -160,7 +212,7 @@ app.post('/repos/:owner/:repo/issues/:id/comments', async (req,res) => {
 
 })
 
-app.patch('/repos/:owner/:repo/issues/comments/:id', async (req,res) => {
+app.patch('/api/repos/:owner/:repo/issues/comments/:id', async (req,res) => {
   const owner = req.params.owner
   const repo = req.params.repo
   const id = req.params.id
@@ -185,7 +237,7 @@ app.patch('/repos/:owner/:repo/issues/comments/:id', async (req,res) => {
 
 })
 
-app.delete('/repos/:owner/:repo/issues/comments/:id', async (req,res) => {
+app.delete('/api/repos/:owner/:repo/issues/comments/:id', async (req,res) => {
   const owner = req.params.owner
   const repo = req.params.repo
   const id = req.params.id

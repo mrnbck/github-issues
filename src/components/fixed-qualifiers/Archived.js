@@ -2,11 +2,14 @@ import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import QualifierChecker from '../QualifierChecker'
 
-const Archived = ({ qualifiers, setQualifiers, archiveToggle }) => {
+const Archived = ({ 
+  qualifiers, setQualifiers, 
+  archiveToggle, setMyIssues 
+}) => {
 
   useEffect(() => {
     if (archiveToggle === false) {
-    
+      
       //remove qualifier when untoggled
       let id = 'no filter'
       let regex = /archived:([\w])+/
@@ -29,7 +32,7 @@ const Archived = ({ qualifiers, setQualifiers, archiveToggle }) => {
 
     const findEntry = qualifiers.filter(value => regex.exec(value))
 
-    QualifierChecker(findEntry, qualifiers, setQualifiers, id)
+    QualifierChecker(findEntry, qualifiers, setQualifiers, id, setMyIssues)
   }
 
   if (archiveToggle === false) {
@@ -37,9 +40,8 @@ const Archived = ({ qualifiers, setQualifiers, archiveToggle }) => {
     return (
       <div></div>)
   }  else 
-  
     return (
-      <div className="form-field">        
+      <div className="form-field" key='1'>   
         <label className="input-label">Archived Repositories</label>
         <span >
           <select id='archived' className="picklist" defaultValue='Both' 
@@ -51,12 +53,13 @@ const Archived = ({ qualifiers, setQualifiers, archiveToggle }) => {
         </span>
       </div>
     )
-
 }
 
 Archived.propTypes = {
   qualifiers: PropTypes.array,
-  setQualifiers: PropTypes.func
+  setQualifiers: PropTypes.func,
+  setMyIssues:PropTypes.func,
+  archiveToggle:PropTypes.bool
 }
 
 export default Archived

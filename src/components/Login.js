@@ -8,24 +8,22 @@ const Login = () => {
 
   const getToken = async (code) => {
 
-    const response = await 
-    fetch(`http://localhost:3001/oauth-token/${code}/${state}`, {
-      credentials: 'include'
-    })
-      
-    const text = await response
-
-    console.log('response.text()',text)
+    try {
+      const response = await 
+      fetch(`/api/oauth-token/${code}/${state}`, {
+        credentials: 'include'
+      })      
+      console.log('response.text()',response)
+    } catch (error) {
+      console.log(error)
+    }
   }
-
   getToken(code)
-
 
   return (
     <>
-      <div>{console.log('logging in')}</div>
+      <div>Logging in</div>
     </>
   )
 }
-
 export default Login

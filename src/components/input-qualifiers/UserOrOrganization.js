@@ -173,7 +173,7 @@ const UserOrOrganization = ({
           ref={(element) => userRef = element}
           onChange={inputFieldContent}
           value={inputFieldValue}
-        /><button  className='OK-button'>{userInput}
+        /><button  className='button OK-button'>{userInput}
         </button>
         </form>
       </span>
@@ -186,7 +186,7 @@ const UserOrOrganization = ({
           ref={(element) => orgRef = element}
           onChange={inputFieldContent}
           value={inputFieldValue}
-        /><button className='OK-button'>{userInput}
+        /><button className='button OK-button'>{userInput}
         </button>
         </form>
       </span>
@@ -210,7 +210,7 @@ const UserOrOrganization = ({
             onChange={repoFieldContent}
             value={repoValue}
           />
-          <button className='OK-button'>{userInput}
+          <button className='button OK-button'>{userInput}
           </button>
         </form>
       </span>

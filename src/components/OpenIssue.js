@@ -54,7 +54,6 @@ const OpenIssue = ({
   }
 
   const styleCancelButton = {
-    backgroundColor: '#808080',
     visibility: 'hidden',
     height: '0px',
     alignSelf: 'end',
@@ -63,7 +62,7 @@ const OpenIssue = ({
 
   const styleIssueState = {
     backgroundColor: '#28a745',
-    padding: '7px 19px',
+    padding: '5px 15px',
     fontWeight: 'bold',
     borderRadius: '15px',
     color: 'white',
@@ -71,7 +70,6 @@ const OpenIssue = ({
     height: '18px',
     lineHeight: '20px',
     textTransform: 'uppercase'
-
   }
 
   const styleIssueHeader = {
@@ -84,10 +82,16 @@ const OpenIssue = ({
     color: '#808080'
   }
 
+  const styleRefreshIcon = {
+    textAlign: 'end',
+    marginBottom: '20px',
+    cursor: 'pointer'
+  }
+
   const fetchComments = async () => {
     //check here if the user is already logged in. 
     
-    const checkLogin = await axios.get('http://localhost:3001/checkLogin', 
+    const checkLogin = await axios.get('/api/checkLogin', 
       { withCredentials: true }).catch(error => error)
     setLogin(checkLogin.data)
 
@@ -133,7 +137,7 @@ const OpenIssue = ({
   //get authenticated user
   useEffect(() => {
     
-    const url = 'http://localhost:3001/user'
+    const url = '/api/user'
 
     const fetchUser = async () => {
       try {
@@ -164,6 +168,30 @@ const OpenIssue = ({
     }
 
     return months[month]
+  }
+
+  const timeStamp = () => {
+    const currentTime = new Date()
+    const year = currentTime.getFullYear()
+    const month = currentTime.getMonth() > 9 ? 
+      currentTime.getMonth()+1 : `0${currentTime.getMonth()+1}`
+    
+    const day = currentTime.getDate() > 9 ? 
+      currentTime.getDate() : `0${currentTime.getDate()}`
+
+    const hours = currentTime.getHours() > 9 ? 
+      currentTime.getHours()-2 : `0${currentTime.getHours()-2}`
+
+    const minutes = currentTime.getMinutes() > 9 ? 
+      currentTime.getMinutes() : `0${currentTime.getMinutes()}`
+
+    const seconds = currentTime.getSeconds() > 9 ? 
+      currentTime.getSeconds() : `0${currentTime.getSeconds()}`
+
+
+    const timeStamp=`${year}-${month}-${day}T${hours}:${minutes}:${seconds}Z`
+
+    return timeStamp
   }
 
   const convertDate = (createdAt, noTime) => {
@@ -197,22 +225,25 @@ const OpenIssue = ({
       } else return (
         <div>
           <ul>{commentsList.map((comment, index) => {
-
             return (              
               <li className='comments-list' key={index}>
                 <div style={styleListTitle} className='comment-header'>
                   <span><b>{comment.user.login}</b> on&nbsp;
-                    {convertDate(comment.created_at)}</span>
+                    {comment.updated_at > comment.created_at ? 
+                      convertDate(comment.updated_at) : 
+                      convertDate(comment.created_at)}
+                    {comment.updated_at !== comment.created_at ? 
+                      <i>&#40;edited&#41;</i>:''}</span>
                   <span>
-                    {user===comment.user.login ? (
+                  </span>
+                  <span>
+                    {user===comment.user.login && comment.url ? (
                       <span>
                         <i className="fas fa-pen comment-icon"
                           onClick={() => hideShowEditor(comment)}
-                          style={styleFontColor}
                         ></i>
                         <i className="fas fa-trash-alt comment-icon" 
                           onClick={() => handleDeleteComment(comment.url)}
-                          style={styleFontColor}
                         ></i>
                       </span>) : ''}
                   </span>
@@ -225,14 +256,14 @@ const OpenIssue = ({
                 </textarea>
                 <div style={styleButtonBar}>
                   <button 
-                    className='close-button'
+                    className='button cancel-button'
                     id={`${comment.id}_button`}
                     style={styleCancelButton}
                     onClick={() => hideShowEditor(comment)}
                   >Cancel
                   </button>
                   <button 
-                    className='close-button'
+                    className='button comment-button'
                     id={`${comment.id}_cancel`}
                     style={styleUpdateCommentButton}
                     onClick={() => handleUpdateComment(comment)}
@@ -251,39 +282,20 @@ const OpenIssue = ({
 
     const handleUpdateComment = async (changedComment) => {
       const regex = /repos\/([\D]|[\w])+/
-      const url=`http://localhost:3001/${changedComment.url.match(regex)[0]}/`
+      const url=`/api/${changedComment.url.match(regex)[0]}/`
 
       const commentBody = {
         body: updateComment
       }
 
-      
-      const currentTime = new Date()
-      const year = currentTime.getFullYear()
-      const month = currentTime.getMonth() > 9 ? 
-        currentTime.getMonth()+1 : `0${currentTime.getMonth()+1}`
-      
-      const day = currentTime.getDate() > 9 ? 
-        currentTime.getDate() : `0${currentTime.getDate()}`
-
-      const hours = currentTime.getHours() > 9 ? 
-        currentTime.getHours() : `0${currentTime.getHours()}`
-
-      const minutes = currentTime.getMinutes() > 9 ? 
-        currentTime.getMinutes() : `0${currentTime.getMinutes()}`
-
-      const seconds = currentTime.getSeconds() > 9 ? 
-        currentTime.getSeconds() : `0${currentTime.getSeconds()}`
-
-
-      const timeStamp=`${year}-${month}-${day}T${hours}:${minutes}:${seconds}Z`
+      const time = timeStamp()
 
       const commentObject = {
         user: {
           login: user
         },
         body: updateComment,
-        created_at: timeStamp
+        created_at: time
       }
       
       try {
@@ -310,16 +322,22 @@ const OpenIssue = ({
 
     const handleSubmitComment = async () => {
       const regex = /repos\/([\D]|[\w])+/
-      const url = `http://localhost:3001/${issue.comments_url.match(regex)[0]}/`
+      const url = `/api/${issue.comments_url.match(regex)[0]}/`
 
-      const comment = {
-        body: newComment
+      const time = timeStamp()
+
+      const commentObject = {
+        user: {
+          login: user
+        },
+        body: newComment,
+        created_at: time
       }
-      
+
       try {
         await fetch(url, { 
           method: 'POST',
-          body: JSON.stringify(comment),
+          body: JSON.stringify(commentObject),
           credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
@@ -329,7 +347,8 @@ const OpenIssue = ({
         console.log(error)
       }
       setNewComment('')
-      setCommentsList(commentsList.concat(newComment))
+      console.log(commentsList)
+      setCommentsList(commentsList.concat(commentObject))
     }
 
     const hideShowEditor = async (comment) => {
@@ -405,7 +424,7 @@ const OpenIssue = ({
     const handleDeleteComment = async (commentUrl) => {
 
       const regex = /repos\/([\D]|[\w])+/
-      const url = `http://localhost:3001/${commentUrl.match(regex)[0]}`
+      const url = `/api/${commentUrl.match(regex)[0]}`
 
       const idRegex = /([^/])+/g
       const urlArray = commentUrl.match(idRegex)
@@ -433,7 +452,7 @@ const OpenIssue = ({
 
     const handleLogin = async (event) => {
       event.preventDefault()
-      const response = await fetch('http://localhost:3001/login')
+      const response = await fetch('/api/login')
       const url = await response.text()
   
       /*window.open(url,
@@ -448,6 +467,8 @@ const OpenIssue = ({
     return (
       <div>
         <div className='display-issue'>
+          <i className="fas fa-arrow-left go-back"
+            onClick={() => close() }></i>
           <h1>{issue.title} #{issue.number}</h1>
           <div style={styleIssueHeader}>
             <span style={styleIssueState}>{issue.state}</span>
@@ -456,10 +477,12 @@ const OpenIssue = ({
               {convertDate(issue.created_at, 'noTime')} |&nbsp;
               {issue.comments} {issue.comments > 1 ? 'comments' : 'comment'}
             </span>
+            <a href={issue.html_url} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className='go-to-github'>View On Github
+            </a>
           </div>
-          <br></br>
-          <a href={issue.html_url} target="_blank" rel="noopener noreferrer">
-            {issue.html_url}</a>
           <div className='issue-content'>
             <div className='issue-main'>
               <div className='issue-body containers'>
@@ -467,6 +490,9 @@ const OpenIssue = ({
               </div>
               <div>
                 <div>{showComments()}</div>
+                <div style={styleRefreshIcon} onClick={() => fetchComments()}>
+                  <i className="fas fa-sync"></i>
+                </div>
               </div>                    
               {!login ? (
               //if the user is not logged in yet, show Login button
@@ -476,7 +502,7 @@ const OpenIssue = ({
                     <Link to='/login'>        
                       <button 
                         style={styleLoginButton} 
-                        className='close-button'
+                        className='button login-button'
                         onClick={handleLogin}>Login
                       </button>
                     </Link>
@@ -492,14 +518,14 @@ const OpenIssue = ({
                     value={newComment}>
                   </textarea>
                   <button 
-                    className='close-button' 
+                    className='button comment-button' 
                     onClick={handleSubmitComment}>Comment
                   </button>
                 </div>)}
               <button 
-                className='close-button' 
+                className='button back-button' 
                 onClick={close}>
-          Close
+                <i className="fas fa-arrow-left"></i>
               </button>
             </div>  
             <div className='sidebar'>
@@ -508,8 +534,9 @@ const OpenIssue = ({
                 issue.assignee.login : 'None'}                
               </div>
               <div style={styleFontColor}>Labels </div>
-              <div className='metadata'>{issue.labels.map(label => {
-                return label.name})}
+              <div className='metadata'>{issue.labels.length > 0 ? 
+                issue.labels.map(label => {
+                  return label.name}) : 'None'}
               </div>
               <div style={styleFontColor}>Milestone </div>
               <div className='metadata'>{issue.milestone ? 
@@ -530,7 +557,7 @@ OpenIssue.propTypes = {
   issue:PropTypes.object,
   showIssue: PropTypes.bool,
   setShowIssue:PropTypes.func,
-  currentPage: PropTypes.string,
+  currentPage: PropTypes.number,
   myIssues: PropTypes.bool,
   setIssue: PropTypes.func
 }
