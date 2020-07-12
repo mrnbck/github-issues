@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
-import QualifierChecker from '../QualifierChecker'
+import QualifierChecker from '../../helpers/QualifierChecker'
 
 const Linked = ({ qualifiers, setQualifiers, linkedToggle, setMyIssues }) => {
 

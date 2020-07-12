@@ -1,6 +1,6 @@
 import React, { useState, createRef, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import QualifierChecker from '../QualifierChecker'
+import QualifierChecker from '../../helpers/QualifierChecker'
 
 const TeamMention = ({ 
   qualifiers, 

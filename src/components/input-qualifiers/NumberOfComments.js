@@ -1,6 +1,6 @@
 import React, { useState, useEffect, createRef } from 'react'
 import PropTypes from 'prop-types'
-import QualifierChecker from '../QualifierChecker'
+import QualifierChecker from '../../helpers/QualifierChecker'
 
 const NumberOfComments = ({ 
   qualifiers, 
