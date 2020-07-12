@@ -5,7 +5,8 @@ import QualifierChecker from '../QualifierChecker'
 const Language = ({ 
   qualifiers, 
   setQualifiers, 
-  languageToggle }) => {
+  languageToggle,
+  setMyIssues }) => {
 
   useEffect(() => {
     if (languageToggle === false) {
@@ -15,12 +16,13 @@ const Language = ({
       let regex = /language:([\w])+/ 
       const findEntry = qualifiers.filter(value => regex.exec(value))
       if (findEntry.length > 0) {
-        QualifierChecker(findEntry, qualifiers, setQualifiers, id)
+        QualifierChecker(findEntry, qualifiers, setQualifiers, id, setMyIssues)
       }
     }
     // eslint-disable-next-line
       },[languageToggle])
   
+  const [inputStyle, setInputStyle] = useState('input-ok')
   const [inputField, setInputField] = useState('')
   const [search, setSearch] = useState('')
   const [inputOnOff, setInputOnOff] = useState('OK')
@@ -74,19 +76,21 @@ const Language = ({
       (search !== '')
     ) {
       if (inputField !== 'no filter') {
-        document.getElementById('input-field').style.pointerEvents = 'none'
-        document.getElementById('input-field')
-          .style.backgroundColor='#fdfdfd'
-        document.getElementById('input-field').style.color = '#a6a6a6'
-        document.getElementById('input-field')
-          .style.textTransform='uppercase'
+        setInputStyle('input-ok')
         setInputOnOff('RESET') 
       }
     }
 
+    if(inputOnOff === 'RESET') {
+      if (inputField !== 'no filter') {
+        setInputStyle('reset')
+      }
+      setInputOnOff('OK')
+      setSearch('')
+    }
+
     //create regex based on value in "id"
     let regex = /language:([\w])+/        
-
 
     //search in qualifiers if current qualifier already exists
     //check both regex since the key is different every time
@@ -98,22 +102,7 @@ const Language = ({
       return null
     })
 
-
-    QualifierChecker(findEntry, qualifiers, setQualifiers, id)
-
-    if(inputOnOff === 'RESET') {
-      if (inputField !== 'no filter') {
-        document.getElementById('input-field').style.pointerEvents = 'auto'
-        document.getElementById('input-field').style.backgroundColor='white'
-        document.getElementById('input-field').style.color = 'black'
-        document.getElementById('input-field').style.textTransform = 
-          'capitalize'
-        document.getElementById('input-field').value = ''
-      }
-      setInputOnOff('OK')
-      setSearch('')
-
-    }
+    QualifierChecker(findEntry, qualifiers, setQualifiers, id, setMyIssues)
   }
 
   //based on value in select show the correct input fields
@@ -122,12 +111,11 @@ const Language = ({
     case 'language:LANGUAGE': 
       return <span>
         <form className='searchbar' onSubmit={handleSubmit}><input 
-          className='input-field'
-          id='input-field'
+          className={`input-field ${inputStyle}`}
           placeholder='Enter Language' 
           ref={(element) => inputRef = element}
           onChange={inputFieldValue}
-        /><button className='OK-button'>{inputOnOff}
+        /><button className='button OK-button'>{inputOnOff}
         </button>
         </form>
       </span>

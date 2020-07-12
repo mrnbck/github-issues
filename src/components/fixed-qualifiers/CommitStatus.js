@@ -2,17 +2,19 @@ import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import QualifierChecker from '../QualifierChecker'
 
-const CommitStatus = ({ qualifiers, setQualifiers, commitStatusToggle }) => {
+const CommitStatus = ({ 
+  qualifiers, setQualifiers, 
+  commitStatusToggle, setMyIssues }) => {
 
   useEffect(() => {
     if (commitStatusToggle === false) {
       
       //remove qualifier when untoggled
       let id = 'no filter'
-      let regex = /\+status:([\w])+/
+      let regex = /status:([\w])+/
       const findEntry = qualifiers.filter(value => regex.exec(value))
       if (findEntry.length > 0) {
-        QualifierChecker(findEntry, qualifiers, setQualifiers, id)
+        QualifierChecker(findEntry, qualifiers, setQualifiers, id, setMyIssues)
       }
     }
     // eslint-disable-next-line
@@ -25,7 +27,7 @@ const CommitStatus = ({ qualifiers, setQualifiers, commitStatusToggle }) => {
     const option = document.getElementById('commitStatus').options
     const id = option[option.selectedIndex].value
     
-    let regex = /\+status:([\w])+/
+    let regex = /status:([\w])+/
     
     const findEntry = qualifiers.filter(value => {
       if(regex.exec(value)) {
@@ -34,7 +36,7 @@ const CommitStatus = ({ qualifiers, setQualifiers, commitStatusToggle }) => {
       return null
     })
 
-    QualifierChecker(findEntry, qualifiers, setQualifiers, id)
+    QualifierChecker(findEntry, qualifiers, setQualifiers, id, setMyIssues)
   }
 
   if (commitStatusToggle === false) {

@@ -6,10 +6,6 @@ const UserOrOrganization = ({
   qualifiers, 
   setQualifiers,
   userOrOrgToggle,
-  inputStyle,
-  setInputStyle,
-  inputOK,
-  inputReset,
   setMyIssues
 }) => {
 
@@ -20,6 +16,7 @@ const UserOrOrganization = ({
   const [userInput, setUserInput] = useState('OK')
   const [inputFieldValue, setInputFieldValue] = useState('')
   const [repoValue, setRepoValue] = useState('')
+  const [inputStyle, setInputStyle] = useState('input-ok')
 
   useEffect(() => {
     if (userOrOrgToggle === false) {
@@ -121,12 +118,12 @@ const UserOrOrganization = ({
     //only reset when not empty. otherwise it will change every time due to 
     //useEffect()
     (userSearch !== '' || orgSearch !== '' || repoSearch !== '')) {
-      setInputStyle(inputReset)
+      setInputStyle('input-reset')
       setUserInput('RESET') 
     }
 
     if(userInput === 'RESET') {
-      setInputStyle(inputOK)
+      setInputStyle('input-ok')
       setUserInput('OK')
       setInputFieldValue('')
       setRepoValue('')
@@ -167,8 +164,7 @@ const UserOrOrganization = ({
     case 'user:USERNAME': 
       return <span>
         <form className='searchbar' onSubmit={handleSubmit}><input 
-          className='input-field'
-          style={inputStyle}
+          className={`input-field ${inputStyle}`}
           placeholder='Enter Username' 
           ref={(element) => userRef = element}
           onChange={inputFieldContent}
@@ -180,8 +176,7 @@ const UserOrOrganization = ({
     case 'org:ORGANIZATION': 
       return <span>
         <form className='searchbar' onSubmit={handleSubmit}><input 
-          className='input-field'
-          style={inputStyle}
+          className={`input-field ${inputStyle}`}
           placeholder='Enter Organization'
           ref={(element) => orgRef = element}
           onChange={inputFieldContent}
@@ -194,17 +189,15 @@ const UserOrOrganization = ({
       return <span>
         <form className='searchbar' onSubmit={handleSubmit}>
           <input 
-            className='input-field'
-            style={inputStyle}
+            className={`input-field ${inputStyle}`}
             placeholder='Enter Username' 
             ref={(element) => userRef = element}
             onChange={inputFieldContent}
             value={inputFieldValue}
           />        
           <input 
-            className='input-field'
+            className={`input-field ${inputStyle}`}
             id='repo-input'
-            style={inputStyle}
             placeholder='Enter Repository' 
             ref={(element) => repositoryRef = element}
             onChange={repoFieldContent}

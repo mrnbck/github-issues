@@ -5,13 +5,15 @@ import QualifierChecker from '../QualifierChecker'
 const Review = ({ 
   qualifiers, 
   setQualifiers,
-  reviewToggle }) => {
+  reviewToggle,
+  setMyIssues }) => {
 
   const [inputField, setInputField] = useState('')
   const [reviewedBy, setReviewedBy] = useState('')
   const [reviewRequested, setReviewRequested] = useState('')
   const [teamReview, setTeamReview] = useState('')
   const [inputOnOff, setInputOnOff] = useState('OK')
+  const [inputStyle, setInputStyle] = useState('input-ok')
 
   useEffect(() => {
     if (reviewToggle === false) {
@@ -34,16 +36,20 @@ const Review = ({
       //check if any of the qualifiers is used by searching the regex. if true, 
       //the others will result in blank.
       if (findReviewedBy.length > 0) {
-        QualifierChecker(findReviewedBy, qualifiers, setQualifiers, id)
+        QualifierChecker(
+          findReviewedBy, qualifiers, setQualifiers, id, setMyIssues)
       } 
       if (findReviewRequested.length > 0) {
-        QualifierChecker(findReviewRequested, qualifiers, setQualifiers, id)
+        QualifierChecker(
+          findReviewRequested, qualifiers, setQualifiers, id, setMyIssues)
       }
       if (findTeamReview.length > 0) {
-        QualifierChecker(findTeamReview, qualifiers, setQualifiers, id)
+        QualifierChecker(
+          findTeamReview, qualifiers, setQualifiers, id, setMyIssues)
       }
       if (findReview.length > 0) {
-        QualifierChecker(findReview, qualifiers, setQualifiers, id)
+        QualifierChecker(
+          findReview, qualifiers, setQualifiers, id, setMyIssues)
       }
     }
     // eslint-disable-next-line
@@ -133,12 +139,19 @@ const Review = ({
         inputField !== 'review:required' &&
         inputField !== 'review:approved'
       ) {
-        document.getElementById('input-field').style.pointerEvents = 'none'
-        document.getElementById('input-field').style.backgroundColor='#fdfdfd'
-        document.getElementById('input-field').style.color = '#a6a6a6'
-        document.getElementById('input-field').style.textTransform='uppercase'
+        setInputStyle('input-reset')
         setInputOnOff('RESET') 
       }
+    }
+
+    if(inputOnOff === 'RESET') {
+      if (inputField !== 'no filter') {
+        setInputStyle('input-ok')
+      }
+      setInputOnOff('OK')
+      setReviewedBy('')
+      setReviewRequested('')
+      setTeamReview('')
     }
 
     //create regex based on value in "id"
@@ -165,22 +178,8 @@ const Review = ({
       return null
     })
 
-    QualifierChecker(findEntry, qualifiers, setQualifiers, id)
+    QualifierChecker(findEntry, qualifiers, setQualifiers, id, setMyIssues)
       
-    if(inputOnOff === 'RESET') {
-      if (inputField !== 'no filter') {
-        document.getElementById('input-field').style.pointerEvents = 'auto'
-        document.getElementById('input-field').style.backgroundColor = 'white'
-        document.getElementById('input-field').style.color = 'black'
-        document.getElementById('input-field').style.textTransform = 
-          'capitalize'
-        document.getElementById('input-field').value = ''
-      }
-      setInputOnOff('OK')
-      setReviewedBy('')
-      setReviewRequested('')
-      setTeamReview('')
-    }
   }
 
   //based on value in select show the correct input fields
@@ -190,24 +189,24 @@ const Review = ({
     case 'reviewed-by:USERNAME': 
       return <span>
         <form className='searchbar' onSubmit={handleSubmit}><input 
-          className='input-field'
+          className={`input-field ${inputStyle}`}
           id='input-field'
           placeholder='Enter Username' 
           ref={(element) => reviewedByRef = element}
           onChange={inputFieldValue}
-        /><button className='OK-button'>{inputOnOff}
+        /><button className='button OK-button'>{inputOnOff}
         </button>
         </form>
       </span>
     case 'review-requested:USERNAME': 
       return <span>
         <form className='searchbar' onSubmit={handleSubmit}><input 
-          className='input-field'
+          className={`input-field ${inputStyle}`}
           id='input-field'
           placeholder='Enter Username'
           ref={(element) => reviewRequestedRef = element}
           onChange={inputFieldValue}
-        /><button className='OK-button'>{inputOnOff}
+        /><button className='button OK-button'>{inputOnOff}
         </button>
         </form>
       </span>
@@ -215,13 +214,13 @@ const Review = ({
       return <span>
         <form className='searchbar' onSubmit={handleSubmit}>
           <input 
-            className='input-field'
+            className={`input-field ${inputStyle}`}
             id='input-field'
             placeholder='Enter Teamname' 
             ref={(element) => reviewedByRef = element}
             onChange={inputFieldValue}
           />        
-          <button className='OK-button'>{inputOnOff}
+          <button className='button OK-button'>{inputOnOff}
           </button>
         </form>
       </span>

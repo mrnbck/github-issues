@@ -41,7 +41,7 @@ const Archived = ({
       <div></div>)
   }  else 
     return (
-      <div className="form-field" key='1'>   
+      <div className="form-field">   
         <label className="input-label">Archived Repositories</label>
         <span >
           <select id='archived' className="picklist" defaultValue='Both' 

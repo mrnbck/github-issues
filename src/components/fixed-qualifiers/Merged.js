@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import QualifierChecker from '../QualifierChecker'
 
-const Merged = ({ qualifiers, setQualifiers, mergeToggle }) => {
+const Merged = ({ qualifiers, setQualifiers, mergeToggle, setMyIssues }) => {
 
   useEffect(() => {
     if (mergeToggle === false) {
@@ -14,10 +14,10 @@ const Merged = ({ qualifiers, setQualifiers, mergeToggle }) => {
       const findMerged = qualifiers.filter(value => mergedRegex.exec(value))
       const findUnmerged = qualifiers.filter(value => unmergedRegex.exec(value))
       if (findMerged.length > 0) {
-        QualifierChecker(findMerged, qualifiers, setQualifiers, id)
+        QualifierChecker(findMerged, qualifiers, setQualifiers, id, setMyIssues)
       } 
       if (findUnmerged.length > 0) {
-        QualifierChecker(findUnmerged, qualifiers, setQualifiers, id)
+        QualifierChecker(findUnmerged, qualifiers, setQualifiers,id,setMyIssues)
       }
     }
     // eslint-disable-next-line
@@ -43,7 +43,7 @@ const Merged = ({ qualifiers, setQualifiers, mergeToggle }) => {
       return null
     })
 
-    QualifierChecker(findEntry, qualifiers, setQualifiers, id)
+    QualifierChecker(findEntry, qualifiers, setQualifiers, id, setMyIssues)
   }
 
   if (mergeToggle === false) {

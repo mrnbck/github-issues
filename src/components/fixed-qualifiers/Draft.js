@@ -2,17 +2,17 @@ import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import QualifierChecker from '../QualifierChecker'
 
-const Draft = ({ qualifiers, setQualifiers, draftToggle }) => {
+const Draft = ({ qualifiers, setQualifiers, draftToggle, setMyIssues }) => {
 
   useEffect(() => {
     if (draftToggle === false) {
       
       //remove qualifier when untoggled
       let id = 'no filter'
-      let regex = /\+draft:([\w])+/
+      let regex = /draft:([\w])+/
       const findEntry = qualifiers.filter(value => regex.exec(value))
       if (findEntry.length > 0) {
-        QualifierChecker(findEntry, qualifiers, setQualifiers, id)
+        QualifierChecker(findEntry, qualifiers, setQualifiers, id, setMyIssues)
       }
     }
     // eslint-disable-next-line
@@ -25,11 +25,11 @@ const Draft = ({ qualifiers, setQualifiers, draftToggle }) => {
     const option = document.getElementById('draft').options
     const id = option[option.selectedIndex].value
     
-    let regex = /\+draft:([\w])+/
+    let regex = /draft:([\w])+/
 
     const findEntry = qualifiers.filter(value => regex.exec(value))
 
-    QualifierChecker(findEntry, qualifiers, setQualifiers, id)
+    QualifierChecker(findEntry, qualifiers, setQualifiers, id, setMyIssues)
   }
 
   if (draftToggle === false) {

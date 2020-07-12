@@ -5,8 +5,10 @@ import QualifierChecker from '../QualifierChecker'
 const BranchName = ({ 
   qualifiers, 
   setQualifiers, 
-  branchToggle }) => {
+  branchToggle,
+  setMyIssues }) => {
 
+  const [inputStyle, setInputStyle] = useState('input-ok')
   const [inputField, setInputField] = useState('')
   const [baseSearch, setBaseSearch] = useState('')
   const [headSearch, setHeadSearch] = useState('')
@@ -24,10 +26,10 @@ const BranchName = ({
       const branchName = qualifiers.filter(value => branchRegex.exec(value))
       const headBranch = qualifiers.filter(value => headRegex.exec(value))
       if (branchName.length > 0) {
-        QualifierChecker(branchName, qualifiers, setQualifiers, id)
+        QualifierChecker(branchName, qualifiers, setQualifiers, id, setMyIssues)
       } 
       if (headBranch.length > 0) {
-        QualifierChecker(headBranch, qualifiers, setQualifiers, id)
+        QualifierChecker(headBranch, qualifiers, setQualifiers, id, setMyIssues)
       }
     }
     // eslint-disable-next-line
@@ -88,14 +90,18 @@ const BranchName = ({
     { 
       if (inputField !== 'no filter') 
       {
-        document.getElementById('base-input').style.pointerEvents='none'
-        document.getElementById('base-input')
-          .style.backgroundColor='#fdfdfd'
-        document.getElementById('base-input').style.color = '#a6a6a6'
-        document.getElementById('base-input')
-          .style.textTransform='uppercase'
+        setInputStyle('input-reset')
         setInputOnOff('RESET')
       }
+    }
+
+    if(inputOnOff === 'RESET') {
+      if (inputField !== 'no filter') {
+        setInputStyle('input-ok')
+      }
+      setInputOnOff('OK')
+      setBaseSearch('')
+      setHeadSearch('')
     }
 
     //create regex based on value in "id"
@@ -117,22 +123,7 @@ const BranchName = ({
     })
     //console.log('findEntry',findEntry)
 
-    QualifierChecker(findEntry, qualifiers, setQualifiers, id)
-
-    if(inputOnOff === 'RESET') {
-      if (inputField !== 'no filter') {
-        document.getElementById('base-input').style.pointerEvents ='auto'
-        document.getElementById('base-input')
-          .style.backgroundColor='white'
-        document.getElementById('base-input').style.color = 'black'
-        document.getElementById('base-input').style.textTransform = 
-          'capitalize'
-        document.getElementById('base-input').value = ''
-      }
-      setInputOnOff('OK')
-      setBaseSearch('')
-      setHeadSearch('')
-    }
+    QualifierChecker(findEntry, qualifiers, setQualifiers, id, setMyIssues)
   }
 
   //based on value in select show the correct input fields
@@ -142,13 +133,13 @@ const BranchName = ({
       return <span>
         <form className='searchbar' onSubmit={handleSubmit}>
           <input 
-            className='input-field'
+            className={`input-field ${inputStyle}`}
             id='base-input'
             placeholder='Enter Base Branch' 
             ref={(element) => baseRef = element}
             onChange={inputFieldValue}
           />
-          <button className='OK-button'>{inputOnOff}
+          <button className='button OK-button'>{inputOnOff}
           </button>
         </form>
       </span>
@@ -156,13 +147,13 @@ const BranchName = ({
       return <span>
         <form className='searchbar' onSubmit={handleSubmit}>
           <input 
-            className='input-field'
+            className={`input-field ${inputStyle}`}
             id='base-input'
             placeholder='Enter Head Branch' 
             ref={(element) => headRef = element}
             onChange={inputFieldValue}
           />
-          <button className='OK-button'>{inputOnOff}
+          <button className='button OK-button'>{inputOnOff}
           </button>
         </form>
       </span>

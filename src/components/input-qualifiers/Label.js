@@ -6,8 +6,9 @@ const UserOrOrganization = ({
   qualifiers, 
   setQualifiers,
   labelToggle,
-  setMyIssues }) => {
+  setMyIssues, }) => {
 
+  const [inputStyle, setInputStyle] = useState('input-ok')
   const [inputField, setInputField] = useState('')
   const [oneLabelSearch, setOneLabelSearch] = useState('')
   const [twoLabelSearch, setTwoLabelSearch] = useState('')
@@ -54,7 +55,6 @@ const UserOrOrganization = ({
 
     console.log('id', id)
 
-    //remember whether USERNAME, ORGANIZATION or REPO
     setInputField(id)    
   }
 
@@ -103,31 +103,19 @@ const UserOrOrganization = ({
     (oneLabelSearch !== '' || twoLabelSearch !== '' || threeLabelSearch !== '')
     ) {
       if (inputField !== 'no filter') {
-        document.getElementById('oneLabel-input').style.pointerEvents = 'none'
-        document.getElementById('oneLabel-input')
-          .style.backgroundColor='#fdfdfd'
-        document.getElementById('oneLabel-input').style.color = '#a6a6a6'
-        document.getElementById('oneLabel-input')
-          .style.textTransform='uppercase'
-        if(document.getElementById('twoLabel-input')) {
-          document.getElementById('twoLabel-input').style.pointerEvents = 'none'
-          document.getElementById('twoLabel-input').style.backgroundColor =
-          '#fdfdfd'
-          document.getElementById('twoLabel-input').style.color='#a6a6a6'
-          document.getElementById('twoLabel-input').style.textTransform =
-          'uppercase'
-        }
-        if(document.getElementById('threeLabel-input')) {
-          document.getElementById('threeLabel-input')
-            .style.pointerEvents = 'none'
-          document.getElementById('threeLabel-input').style.backgroundColor =
-          '#fdfdfd'
-          document.getElementById('threeLabel-input').style.color='#a6a6a6'
-          document.getElementById('threeLabel-input').style.textTransform =
-          'uppercase'
-        }
-        setInputOnOff('RESET') 
+        setInputStyle('input-reset')
       }
+      setInputOnOff('RESET') 
+    }
+    
+    if(inputOnOff === 'RESET') {
+      if (inputField !== 'no filter') {
+        setInputStyle('input-ok')
+      }
+      setInputOnOff('OK')
+      setOneLabelSearch('')
+      setTwoLabelSearch('')
+      setThreeLabelSearch('')
     }
 
     //create regex based on value in "id"
@@ -146,40 +134,6 @@ const UserOrOrganization = ({
 
     QualifierChecker(findEntry, qualifiers, setQualifiers, id, setMyIssues)
       
-    if(inputOnOff === 'RESET') {
-      if (inputField !== 'no filter') {
-        document.getElementById('oneLabel-input').style.pointerEvents = 'auto'
-        document.getElementById('oneLabel-input')
-          .style.backgroundColor = 'white'
-        document.getElementById('oneLabel-input').style.color = 'black'
-        document.getElementById('oneLabel-input').style.textTransform = 
-          'capitalize'
-        document.getElementById('oneLabel-input').value = ''
-        if(document.getElementById('twoLabel-input')) {
-          document.getElementById('twoLabel-input').style.pointerEvents = 'auto'
-          document.getElementById('twoLabel-input')
-            .style.backgroundColor='white'
-          document.getElementById('twoLabel-input').style.color = 'black'
-          document.getElementById('twoLabel-input').style.textTransform=
-            'capitalize'
-          document.getElementById('twoLabel-input').value = ''
-        }
-        if(document.getElementById('threeLabel-input')) {
-          document.getElementById('threeLabel-input')
-            .style.pointerEvents = 'auto'
-          document.getElementById('threeLabel-input')
-            .style.backgroundColor='white'
-          document.getElementById('threeLabel-input').style.color = 'black'
-          document.getElementById('threeLabel-input').style.textTransform=
-            'capitalize'
-          document.getElementById('threeLabel-input').value = ''
-        }
-      }
-      setInputOnOff('OK')
-      setOneLabelSearch('')
-      setTwoLabelSearch('')
-      setThreeLabelSearch('')
-    }
   }
 
   //based on value in select show the correct input fields
@@ -189,7 +143,7 @@ const UserOrOrganization = ({
     case 'one:LABEL': 
       return <span>
         <form className='searchbar' onSubmit={handleSubmit}><input 
-          className='input-field'
+          className={`input-field ${inputStyle}`}
           id='oneLabel-input'
           placeholder='Enter Label' 
           ref={(element) => oneLabelRef = element}
@@ -202,14 +156,14 @@ const UserOrOrganization = ({
       return <span>
         <form className='label-searchbar' onSubmit={handleSubmit}>
           <input 
-            className='input-field'
+            className={`input-field ${inputStyle}`}
             id='oneLabel-input'
             placeholder='Enter Label' 
             ref={(element) => oneLabelRef = element}
             onChange={inputFieldValue}
           />
           <input 
-            className='input-field'
+            className={`input-field ${inputStyle}`}
             id='twoLabel-input'
             placeholder='Enter Label'
             ref={(element) => twoLabelRef = element}
@@ -222,22 +176,19 @@ const UserOrOrganization = ({
       return <span>
         <form className='label-searchbar' onSubmit={handleSubmit}>
           <input 
-            className='input-field'
-            id='oneLabel-input'
+            className={`input-field ${inputStyle}`}
             placeholder='Enter Label' 
             ref={(element) => oneLabelRef = element}
             onChange={inputFieldValue}
           />
           <input 
-            className='input-field'
-            id='twoLabel-input'
+            className={`input-field ${inputStyle}`}
             placeholder='Enter Label'
             ref={(element) => twoLabelRef = element}
             onChange={inputFieldValue}
           />
           <input 
-            className='input-field'
-            id='threeLabel-input'
+            className={`input-field ${inputStyle}`}
             placeholder='Enter Label' 
             ref={(element) => threeLabelRef = element}
             onChange={inputFieldValue}

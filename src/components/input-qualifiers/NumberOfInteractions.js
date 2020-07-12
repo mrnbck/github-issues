@@ -5,13 +5,15 @@ import QualifierChecker from '../QualifierChecker'
 const Interactions = ({ 
   qualifiers, 
   setQualifiers,
-  interactionsToggle }) => {
+  interactionsToggle,
+  setMyIssues }) => {
 
   const [inputField, setInputField] = useState('')
   const [moreThanSearch, setMoreThanSearch] = useState('')
   const [lessThanSearch, setLessThenSearch] = useState('')
   const [rangeSearch, setRangeSearch] = useState('')
   const [inputOnOff, setInputOnOff] = useState('OK')
+  const [inputStyle, setInputStyle] = useState('input-ok')
 
   useEffect(() => {
     if (interactionsToggle === false) {
@@ -25,15 +27,15 @@ const Interactions = ({
       //the others will result in blank.
       const moreThan = qualifiers.filter(value => moreThanRegex.exec(value))
       if (moreThan.length > 0) {
-        QualifierChecker(moreThan, qualifiers, setQualifiers, id)
+        QualifierChecker(moreThan, qualifiers, setQualifiers, id, setMyIssues)
       } else {
         const lessThan = qualifiers.filter(value => lessThanRegex.exec(value))
         if (lessThan.length > 0) {
-          QualifierChecker(lessThan, qualifiers, setQualifiers, id)
+          QualifierChecker(lessThan, qualifiers, setQualifiers, id, setMyIssues)
         } else {
           const range = qualifiers.filter(value => rangeRegex.exec(value))
           if (range.length > 0) {
-            QualifierChecker(range, qualifiers, setQualifiers, id)
+            QualifierChecker(range, qualifiers, setQualifiers, id, setMyIssues)
           }
         }
       }
@@ -61,8 +63,6 @@ const Interactions = ({
 
     const id = 
       option[option.selectedIndex].value
-
-    console.log('id', id)
 
     setInputField(id)    
   }
@@ -110,20 +110,19 @@ const Interactions = ({
     (moreThanSearch !== '' || lessThanSearch !== '' || rangeSearch !== '')
     ) {
       if (inputField !== 'no filter') {
-        document.getElementById('input-field').style.pointerEvents = 'none'
-        document.getElementById('input-field').style.backgroundColor='#fdfdfd'
-        document.getElementById('input-field').style.color = '#a6a6a6'
-        document.getElementById('input-field').style.textTransform='uppercase'
-        if(document.getElementById('range-input')) {
-          document.getElementById('range-input').style.pointerEvents = 'none'
-          document.getElementById('range-input').style.backgroundColor =
-          '#fdfdfd'
-          document.getElementById('range-input').style.color='#a6a6a6'
-          document.getElementById('range-input').style.textTransform =
-          'uppercase'
-        }
-        setInputOnOff('RESET') 
+        setInputStyle('input-reset')
       }
+      setInputOnOff('RESET') 
+    }
+
+    if(inputOnOff === 'RESET') {
+      if (inputField !== 'no filter') {
+        setInputStyle('input-ok')
+      }
+      setInputOnOff('OK')
+      setMoreThanSearch('')
+      setLessThenSearch('')
+      setRangeSearch('')
     }
 
     //create regex based on value in "id"
@@ -147,30 +146,8 @@ const Interactions = ({
       return null
     })
 
-    QualifierChecker(findEntry, qualifiers, setQualifiers, id)
+    QualifierChecker(findEntry, qualifiers, setQualifiers, id, setMyIssues)
       
-    if(inputOnOff === 'RESET') {
-      if (inputField !== 'no filter') {
-        document.getElementById('input-field').style.pointerEvents = 'auto'
-        document.getElementById('input-field').style.backgroundColor = 'white'
-        document.getElementById('input-field').style.color = 'black'
-        document.getElementById('input-field').style.textTransform = 
-          'capitalize'
-        document.getElementById('input-field').value = ''
-        if(document.getElementById('range-input')) {
-          document.getElementById('range-input').style.pointerEvents = 'auto'
-          document.getElementById('range-input').style.backgroundColor='white'
-          document.getElementById('range-input').style.color = 'black'
-          document.getElementById('range-input').style.textTransform=
-            'capitalize'
-          document.getElementById('range-input').value = ''
-        }
-      }
-      setInputOnOff('OK')
-      setMoreThanSearch('')
-      setLessThenSearch('')
-      setRangeSearch('')
-    }
   }
 
   //based on value in select show the correct input fields
@@ -180,24 +157,24 @@ const Interactions = ({
     case 'interactions:>n': 
       return <span>
         <form className='searchbar' onSubmit={handleSubmit}><input 
-          className='input-field'
+          className={`input-field ${inputStyle}`}
           id='input-field'
           placeholder='Enter Number of Interactions' 
           ref={(element) => moreThanRef = element}
           onChange={inputFieldValue}
-        /><button className='OK-button'>{inputOnOff}
+        /><button className='button OK-button'>{inputOnOff}
         </button>
         </form>
       </span>
     case 'interactions:<n': 
       return <span>
         <form className='searchbar' onSubmit={handleSubmit}><input 
-          className='input-field'
+          className={`input-field ${inputStyle}`}
           id='input-field'
           placeholder='Enter Number of Interactions'
           ref={(element) => lessThanRef = element}
           onChange={inputFieldValue}
-        /><button className='OK-button'>{inputOnOff}
+        /><button className='button OK-button'>{inputOnOff}
         </button>
         </form>
       </span>
@@ -205,20 +182,20 @@ const Interactions = ({
       return <span>
         <form className='searchbar' onSubmit={handleSubmit}>
           <input 
-            className='input-field'
+            className={`input-field ${inputStyle}`}
             id='input-field'
             placeholder='Enter Number of Interactions' 
             ref={(element) => moreThanRef = element}
             onChange={inputFieldValue}
           />        
           <input 
-            className='input-field'
+            className={`input-field ${inputStyle}`}
             id='range-input'
             placeholder='Enter Number of Interactions' 
             ref={(element) => rangeRef = element}
             onChange={inputFieldValue}
           />
-          <button className='OK-button'>{inputOnOff}
+          <button className='button OK-button'>{inputOnOff}
           </button>
         </form>
       </span>

@@ -5,12 +5,14 @@ import QualifierChecker from '../QualifierChecker'
 const ProjectBoard = ({ 
   qualifiers, 
   setQualifiers, 
-  projectBoardToggle }) => {
+  projectBoardToggle,
+  setMyIssues }) => {
 
   const [inputField, setInputField] = useState('')
   const [boardSearch, setBoardSearch] = useState('')
   const [repoSearch, setRepoSearch] = useState('')
   const [inputOnOff, setInputOnOff] = useState('OK')
+  const [inputStyle, setInputStyle] = useState('input-ok')
 
   useEffect(() => {
     if (projectBoardToggle === false) {
@@ -22,10 +24,10 @@ const ProjectBoard = ({
       const findRepo = qualifiers.filter(value => repoRegex.exec(value))
       const findBoard = qualifiers.filter(value => boardRegex.exec(value))
       if (findRepo.length > 0) {
-        QualifierChecker(findRepo, qualifiers, setQualifiers, id)
+        QualifierChecker(findRepo, qualifiers, setQualifiers, id, setMyIssues)
       } 
       if (findBoard.length > 0) {
-        QualifierChecker(findBoard, qualifiers, setQualifiers, id)
+        QualifierChecker(findBoard, qualifiers, setQualifiers, id, setMyIssues)
       }
     }
     // eslint-disable-next-line
@@ -86,22 +88,18 @@ const ProjectBoard = ({
     { 
       if (inputField !== 'no filter') 
       {
-        document.getElementById('board-input').style.pointerEvents='none'
-        document.getElementById('board-input')
-          .style.backgroundColor='#fdfdfd'
-        document.getElementById('board-input').style.color = '#a6a6a6'
-        document.getElementById('board-input')
-          .style.textTransform='uppercase'
-        if(document.getElementById('repo-input')) {
-          document.getElementById('repo-input').style.pointerEvents = 'none'
-          document.getElementById('repo-input').style.backgroundColor =
-            '#fdfdfd'
-          document.getElementById('repo-input').style.color='#a6a6a6'
-          document.getElementById('repo-input').style.textTransform =
-            'uppercase'
-        }
+        setInputStyle('input-reset')
         setInputOnOff('RESET')
       }
+    }
+
+    if(inputOnOff === 'RESET') {
+      if (inputField !== 'no filter') {
+        setInputStyle('input-ok')
+      }
+      setInputOnOff('OK')
+      setBoardSearch('')
+      setRepoSearch('')
     }
 
     //create regex based on value in "id"
@@ -123,30 +121,8 @@ const ProjectBoard = ({
     })
     //console.log('findEntry',findEntry)
 
-    QualifierChecker(findEntry, qualifiers, setQualifiers, id)
+    QualifierChecker(findEntry, qualifiers, setQualifiers, id, setMyIssues)
 
-    if(inputOnOff === 'RESET') {
-      if (inputField !== 'no filter') {
-        document.getElementById('board-input').style.pointerEvents ='auto'
-        document.getElementById('board-input')
-          .style.backgroundColor='white'
-        document.getElementById('board-input').style.color = 'black'
-        document.getElementById('board-input').style.textTransform = 
-          'capitalize'
-        document.getElementById('board-input').value = ''
-        if(document.getElementById('repo-input')) {
-          document.getElementById('repo-input').style.pointerEvents = 'auto'
-          document.getElementById('repo-input').style.backgroundColor='white'
-          document.getElementById('repo-input').style.color = 'black'
-          document.getElementById('repo-input').style.textTransform=
-            'capitalize'
-          document.getElementById('repo-input').value = ''
-        }
-      }
-      setInputOnOff('OK')
-      setBoardSearch('')
-      setRepoSearch('')
-    }
   }
 
   //based on value in select show the correct input fields
@@ -156,20 +132,20 @@ const ProjectBoard = ({
       return <span>
         <form className='searchbar' onSubmit={handleSubmit}>
           <input 
-            className='input-field'
+            className={`input-field ${inputStyle}`}
             id='repo-input'
             placeholder='Enter repository' 
             ref={(element) => repoRef = element}
             onChange={inputFieldValue}
           />
           <input 
-            className='input-field'
+            className={`input-field ${inputStyle}`}
             id='board-input'
             placeholder='Enter project board' 
             ref={(element) => boardRef = element}
             onChange={inputFieldValue}
           />
-          <button className='OK-button'>{inputOnOff}
+          <button className='button OK-button'>{inputOnOff}
           </button>
         </form>
       </span>
@@ -177,13 +153,13 @@ const ProjectBoard = ({
       return <span>
         <form className='searchbar' onSubmit={handleSubmit}>
           <input 
-            className='input-field'
+            className={`input-field ${inputStyle}`}
             id='board-input'
             placeholder='Enter project board' 
             ref={(element) => boardRef = element}
             onChange={inputFieldValue}
           />
-          <button className='OK-button'>{inputOnOff}
+          <button className='button OK-button'>{inputOnOff}
           </button>
         </form>
       </span>

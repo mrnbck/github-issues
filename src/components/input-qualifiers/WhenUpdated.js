@@ -5,13 +5,15 @@ import QualifierChecker from '../QualifierChecker'
 const NumberOfComments = ({ 
   qualifiers, 
   setQualifiers,
-  whenUpdatedToggle }) => {
+  whenUpdatedToggle,
+  setMyIssues }) => {
 
   const [inputField, setInputField] = useState('')
   const [moreThanSearch, setMoreThanSearch] = useState('')
   const [lessThanSearch, setLessThenSearch] = useState('')
   const [rangeSearch, setRangeSearch] = useState('')
   const [inputOnOff, setInputOnOff] = useState('OK')
+  const [inputStyle, setInputStyle] = useState('input-ok')
 
   useEffect(() => {
     if (whenUpdatedToggle === false) {
@@ -26,15 +28,15 @@ const NumberOfComments = ({
       //the others will result in blank.
       const moreThan = qualifiers.filter(value => moreThanRegex.exec(value))
       if (moreThan.length > 0) {
-        QualifierChecker(moreThan, qualifiers, setQualifiers, id)
+        QualifierChecker(moreThan, qualifiers, setQualifiers, id, setMyIssues)
       } else {
         const lessThan = qualifiers.filter(value => lessThanRegex.exec(value))
         if (lessThan.length > 0) {
-          QualifierChecker(lessThan, qualifiers, setQualifiers, id)
+          QualifierChecker(lessThan, qualifiers, setQualifiers, id, setMyIssues)
         } else {
           const range = qualifiers.filter(value => rangeRegex.exec(value))
           if (range.length > 0) {
-            QualifierChecker(range, qualifiers, setQualifiers, id)
+            QualifierChecker(range, qualifiers, setQualifiers, id, setMyIssues)
           }
         }
       }
@@ -111,23 +113,7 @@ const NumberOfComments = ({
     (moreThanSearch !== '' || lessThanSearch !== '' || rangeSearch !== '')
     ) {
       if (inputField !== 'no filter') {
-        document.getElementById('updated-input-field')
-          .style.pointerEvents = 'none'
-        document.getElementById('updated-input-field')
-          .style.backgroundColor='#fdfdfd'
-        document.getElementById('updated-input-field')
-          .style.color = '#a6a6a6'
-        document.getElementById('updated-input-field')
-          .style.textTransform='uppercase'
-        if(document.getElementById('updated-range-input')) {
-          document.getElementById('updated-range-input')
-            .style.pointerEvents = 'none'
-          document.getElementById('updated-range-input').style.backgroundColor =
-          '#fdfdfd'
-          document.getElementById('updated-range-input').style.color='#a6a6a6'
-          document.getElementById('updated-range-input').style.textTransform =
-          'uppercase'
-        }
+        setInputStyle('input-reset')
         setInputOnOff('RESET') 
       }
     }
@@ -154,28 +140,11 @@ const NumberOfComments = ({
       return null
     })
 
-    QualifierChecker(findEntry, qualifiers, setQualifiers, id)
+    QualifierChecker(findEntry, qualifiers, setQualifiers, id, setMyIssues)
       
     if(inputOnOff === 'RESET') {
       if (inputField !== 'no filter') {
-        document.getElementById('updated-input-field')
-          .style.pointerEvents = 'auto'
-        document.getElementById('updated-input-field')
-          .style.backgroundColor = 'white'
-        document.getElementById('updated-input-field').style.color = 'black'
-        document.getElementById('updated-input-field').style.textTransform = 
-          'capitalize'
-        document.getElementById('updated-input-field').value = ''
-        if(document.getElementById('updated-range-input')) {
-          document.getElementById('updated-range-input')
-            .style.pointerEvents = 'auto'
-          document.getElementById('updated-range-input')
-            .style.backgroundColor='white'
-          document.getElementById('updated-range-input').style.color = 'black'
-          document.getElementById('updated-range-input').style.textTransform=
-            'capitalize'
-          document.getElementById('updated-range-input').value = ''
-        }
+        setInputStyle('input-ok')
       }
       setInputOnOff('OK')
       setMoreThanSearch('')
@@ -191,26 +160,26 @@ const NumberOfComments = ({
     case 'updated:>n': 
       return <span>
         <form className='searchbar' onSubmit={handleSubmit}><input 
-          className='input-field'
+          className={`input-field ${inputStyle}`}
           type='date'
           id='updated-input-field'
           placeholder='Enter Date YYYY-MM-DD' 
           ref={(element) => moreThanRef = element}
           onChange={inputFieldValue}
-        /><button className='OK-button'>{inputOnOff}
+        /><button className='button OK-button'>{inputOnOff}
         </button>
         </form>
       </span>
     case 'updated:<n': 
       return <span>
         <form className='searchbar' onSubmit={handleSubmit}><input 
-          className='input-field'
+          className={`input-field ${inputStyle}`}
           type='date'
           id='updated-input-field'
           placeholder='Enter Date YYYY-MM-DD'
           ref={(element) => lessThanRef = element}
           onChange={inputFieldValue}
-        /><button className='OK-button'>{inputOnOff}
+        /><button className='button OK-button'>{inputOnOff}
         </button>
         </form>
       </span>
@@ -218,7 +187,7 @@ const NumberOfComments = ({
       return <span>
         <form className='searchbar' onSubmit={handleSubmit}>
           <input 
-            className='input-field'
+            className={`input-field ${inputStyle}`}
             type='date'
             id='updated-input-field'
             placeholder='Enter Date YYYY-MM-DD' 
@@ -226,14 +195,14 @@ const NumberOfComments = ({
             onChange={inputFieldValue}
           />        
           <input 
-            className='input-field'
+            className={`input-field ${inputStyle}`}
             type='date'
             id='updated-range-input'
             placeholder='Enter Date YYYY-MM-DD' 
             ref={(element) => rangeRef = element}
             onChange={inputFieldValue}
           />
-          <button className='OK-button'>{inputOnOff}
+          <button className='button OK-button'>{inputOnOff}
           </button>
         </form>
       </span>

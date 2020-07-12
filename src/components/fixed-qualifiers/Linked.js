@@ -2,15 +2,15 @@ import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import QualifierChecker from '../QualifierChecker'
 
-const Linked = ({ qualifiers, setQualifiers, linkedToggle }) => {
+const Linked = ({ qualifiers, setQualifiers, linkedToggle, setMyIssues }) => {
 
   useEffect(() => {
     if (linkedToggle === false) {
       
       //remove qualifier when untoggled
       let id = 'no filter'
-      let linkedRegex = /\+linked:([\w])+/
-      let notLinkedRegex = /\+-linked:([\w])+/
+      let linkedRegex = /linked:([\w])+/
+      let notLinkedRegex = /-linked:([\w])+/
       
       const findLinked = qualifiers.filter(value => 
         linkedRegex.exec(value))
@@ -18,10 +18,10 @@ const Linked = ({ qualifiers, setQualifiers, linkedToggle }) => {
         notLinkedRegex.exec(value))
 
       if (findLinked.length > 0) {
-        QualifierChecker(findLinked, qualifiers, setQualifiers, id)
+        QualifierChecker(findLinked, qualifiers, setQualifiers, id, setMyIssues)
       }
       if (findNotLinked.length > 0) {
-        QualifierChecker(findNotLinked, qualifiers, setQualifiers, id)
+        QualifierChecker(findNotLinked, qualifiers,setQualifiers,id,setMyIssues)
       }
     }
     // eslint-disable-next-line
@@ -34,8 +34,8 @@ const Linked = ({ qualifiers, setQualifiers, linkedToggle }) => {
     const option = document.getElementById('linked').options
     const id = option[option.selectedIndex].value
     
-    let linkedRegex = /\+linked:([\w])+/
-    let notLinkedRegex = /\+-linked:([\w])+/
+    let linkedRegex = /linked:([\w])+/
+    let notLinkedRegex = /-linked:([\w])+/
 
     const findEntry = qualifiers.filter(value => {
       if(linkedRegex.exec(value)) {
@@ -47,7 +47,7 @@ const Linked = ({ qualifiers, setQualifiers, linkedToggle }) => {
       return null
     })
 
-    QualifierChecker(findEntry, qualifiers, setQualifiers, id)
+    QualifierChecker(findEntry, qualifiers, setQualifiers, id, setMyIssues)
   }
 
   if (linkedToggle === false) {

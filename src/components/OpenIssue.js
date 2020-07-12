@@ -91,9 +91,21 @@ const OpenIssue = ({
   const fetchComments = async () => {
     //check here if the user is already logged in. 
     
-    const checkLogin = await axios.get('/api/checkLogin', 
+    /*const checkLogin = await axios.get('/api/checkLogin', 
       { withCredentials: true }).catch(error => error)
-    setLogin(checkLogin.data)
+    setLogin(checkLogin.data)*/
+    const url = '/api/user'
+    //get authenticated user
+    const fetchUser = async () => {
+      try {
+        const user = await axios(url, { withCredentials: 'true' })
+        setUser(user.data)
+        setLogin(true)
+      } catch(error) {
+        console.log(error)
+      }
+    }
+    fetchUser()
 
     const promise = await axios.get(issue.comments_url)
     setCommentsList(promise.data)
@@ -107,7 +119,6 @@ const OpenIssue = ({
       const getIssue = await axios.get(issue.url)      
       setIssue(getIssue.data)
     }
-
     refreshIssue()
     // eslint-disable-next-line
   }, [])
@@ -133,22 +144,6 @@ const OpenIssue = ({
       setShowIssue(false)
     }
   })
-
-  //get authenticated user
-  useEffect(() => {
-    
-    const url = '/api/user'
-
-    const fetchUser = async () => {
-      try {
-        const user = await axios(url, { withCredentials: 'true' })
-        setUser(user.data)
-      } catch(error) {
-        console.log(error)
-      }
-    }
-    fetchUser()
-  }, [])
 
   const convertMonth = month => {
     

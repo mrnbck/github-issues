@@ -21,8 +21,7 @@ textarea { box-sizing: border-box; border: 1px solid #cbcbcb; margin-bottom: 10p
 .search-input-extended { position: fixed; color: white; background-color: #252525; cursor: pointer; transition: .5s; filter: invert(0%); width: 35px; height: 33px; line-height: 33px; text-align: center; }
 .search-input-extended:hover { transition: .5s; filter: invert(10%); font-size: 18px; }
 #open-extended-icon { height: 16px; transition: .2s; }
-.form-field { display: flex; align-items: baseline; margin-bottom: 20px; margin-left: 15px; transition: 0.4s; animation: slide-in 0.4s; }
-@keyframes slide-in { 0% { margin-left: -30px; opacity: 0; } 100% { margin-left: 15px; opacity: 1; } }
+.form-field { display: flex; align-items: baseline; margin-bottom: 20px; margin-left: 15px; transition: 0.2s; }
 .input-label { line-height: 30px; } 
 .radio-label { margin-left: 10px; }
 .picklist { line-height: 30px; margin: 0 10px; font-size: 14px; }
@@ -30,6 +29,8 @@ textarea { box-sizing: border-box; border: 1px solid #cbcbcb; margin-bottom: 10p
 .searchbar { position: relative; display: inline-flex; align-items: center; }
 .label-searchbar {  display: flex; flex-direction: column; align-items: flex-start; }
 .extended-search-buttons { display: flex; flex-direction: row; justify-content: space-between; margin-top: 60px; margin-bottom: 20px; } 
+.input-ok { pointer-events: auto; background-color: white; color: black; text-Transform: capitalize }
+.input-reset { pointer-events: none; background-color: #fdfdfd; color: #a6a6a6; text-Transform: uppercase }
 .go-back { position: absolute; font-size: 24px; transform: translate(-55px, 24px); cursor: pointer; transition: 0.3s; font-weight: 700}
 .go-back:hover { transform: translate(-65px, 24px); transition: 0.3s; color: #808080; padding-right: 20px}
 .button {position: relative; background-color: #252525; color: white; cursor: pointer; width: 33px; height: 33px; border-radius: 4px; letter-spacing: 1px;}
@@ -53,7 +54,7 @@ textarea { box-sizing: border-box; border: 1px solid #cbcbcb; margin-bottom: 10p
 .quickinfo:hover::before { content: " "; position: absolute; left: 446px; border-width: 12px; border-style: solid; border-color: transparent transparent transparent #353535; margin-left: 1px;}
 .hovercard { display: flex; flex-direction: column; justify-content: flex-start; background-color: #353535; padding: 10px; border-radius: 6px; color: white; width: 200px; line-height: 15px;}
 
-.issue-main { width: 70%; }
+.issue-main { width: 85%; }
 .qualifier-list-header { font-size: 20px; color: white; margin-top: 0; margin-bottom: 30px; }
 .switch input /* Hide default HTML checkbox */ { display: flex; margin: 0; opacity: 0; width: 0; height: 0; }
 .slider /* The slider */ { display: inline-block; position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; width: 50px; height: 29px; background-color: #ccc; -webkit-transition: .4s; transition: .4s; }
@@ -64,10 +65,10 @@ input:checked+.slider:before { -webkit-transform: translateX(21px); transform: t
 .slider.round /* Rounded sliders */ { border-radius: 24px; margin-right: 20px; }
 .slider.round:before { border-radius: 50%; }
 .issue-content { display: flex;  flex-direction: row; }
-.display-issue { background-color: white; overflow-y: auto; width: 80%; margin: 0px auto 60px; z-index: 4; max-width: 980px; min-width: 400px;}
+.display-issue { background-color: white; overflow-y: auto; width: 85%; margin: 0px auto 60px; z-index: 4; max-width: 1080px; min-width: 400px;}
 .go-to-github { background-color: #3a3a3a; padding: 5px 15px; border-radius: 15px; color: white; margin-left: 10px; height: 18px; line-height: 20px; text-transform: uppercase; text-decoration: none; transition: 0.3s }
 .go-to-github:hover { background-color: #505050; transition: 0.3s;}
-.sidebar { display: flex; flex-direction: column; flex: 1; margin: 30px 20px; border-radius: 4px; border: 1px solid #cbcbcb; padding: 15px 30px; width: 30%; height: max-content }
+.sidebar { display: flex; flex-direction: column; margin: 30px 20px; border-radius: 4px; border: 1px solid #cbcbcb; padding: 15px 30px; width: 15%; height: max-content }
 .issue-body { border-radius: 4px; margin-top: 30px; padding: 10px; }
 .containers { border: 1px solid #cbcbcb; padding: 15px 30px; margin-bottom: 20px; }
 .update-comment { visibility: hidden; padding: 0; margin: 0; height: 0; width: auto; }
@@ -78,21 +79,6 @@ input:checked+.slider:before { -webkit-transform: translateX(21px); transform: t
 .picker-top-bar { display: flex; flex-direction: row; justify-content: space-between; } 
 .picker-search { height: 20px; line-height: 20px; padding-left: 15px; }
 .metadata { margin: 10px 0; }
-
-.display-enter, .display-appear {
-  top: var(--menu-starting-top);
-  width: var(--toggler-width);
-  max-height: var(--toggler-height);
-  color: var(--fade-from-color);
-  background-color: var(--toggler-bg-color);
-}.display-enter-active, .display-appear-active {
-  top: var(--menu-ending-top);
-  width: var(--menu-width);
-  max-height: var(--menu-max-height);
-  color: var(--fade-to-color);
-  background-color: var(--menu-bg-color);
-  transition: all var(--timeout);
-}
 
 @media only screen and (max-width: 600px) {
   #qualifier-picker { max-width: 350px; }

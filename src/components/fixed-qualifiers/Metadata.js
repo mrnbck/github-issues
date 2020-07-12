@@ -2,7 +2,9 @@ import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import QualifierChecker from '../QualifierChecker'
 
-const Metadata = ({ qualifiers, setQualifiers, metadataToggle }) => {
+const Metadata = ({ 
+  qualifiers, setQualifiers, 
+  metadataToggle, setMyIssues }) => {
 
   useEffect(() => {
     if (metadataToggle === false) {
@@ -12,7 +14,7 @@ const Metadata = ({ qualifiers, setQualifiers, metadataToggle }) => {
       let regex = /no:([\w])+/
       const findEntry = qualifiers.filter(value => regex.exec(value))
       if (findEntry.length > 0) {
-        QualifierChecker(findEntry, qualifiers, setQualifiers, id)
+        QualifierChecker(findEntry, qualifiers, setQualifiers, id, setMyIssues)
       }
     }
     // eslint-disable-next-line
@@ -29,7 +31,7 @@ const Metadata = ({ qualifiers, setQualifiers, metadataToggle }) => {
 
     const findEntry = qualifiers.filter(value => regex.exec(value))
 
-    QualifierChecker(findEntry, qualifiers, setQualifiers, id)
+    QualifierChecker(findEntry, qualifiers, setQualifiers, id, setMyIssues)
   }
 
   if (metadataToggle === false) {

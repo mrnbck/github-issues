@@ -5,7 +5,8 @@ import QualifierChecker from '../QualifierChecker'
 const Mention = ({ 
   qualifiers, 
   setQualifiers, 
-  mentionToggle }) => {
+  mentionToggle,
+  setMyIssues }) => {
 
   useEffect(() => {
     if (mentionToggle === false) {
@@ -15,7 +16,7 @@ const Mention = ({
       let regex = /mentions:([\w])+/
       const findEntry = qualifiers.filter(value => regex.exec(value))
       if (findEntry.length > 0) {
-        QualifierChecker(findEntry, qualifiers, setQualifiers, id)
+        QualifierChecker(findEntry, qualifiers, setQualifiers, id, setMyIssues)
       }
     }
     // eslint-disable-next-line
@@ -24,6 +25,7 @@ const Mention = ({
   const [inputField, setInputField] = useState('')
   const [search, setSearch] = useState('')
   const [inputOnOff, setInputOnOff] = useState('OK')
+  const [inputStyle, setInputStyle] = useState('input-ok')
 
   //reset input fields when changing the field
   useEffect(() => {
@@ -74,12 +76,7 @@ const Mention = ({
       (search !== '')
     ) {
       if (inputField !== 'no filter') {
-        document.getElementById('mention-input').style.pointerEvents = 'none'
-        document.getElementById('mention-input')
-          .style.backgroundColor='#fdfdfd'
-        document.getElementById('mention-input').style.color = '#a6a6a6'
-        document.getElementById('mention-input')
-          .style.textTransform='uppercase'
+        setInputStyle('input-reset')
         setInputOnOff('RESET') 
       }
     }
@@ -99,16 +96,11 @@ const Mention = ({
     })
 
 
-    QualifierChecker(findEntry, qualifiers, setQualifiers, id)
+    QualifierChecker(findEntry, qualifiers, setQualifiers, id, setMyIssues)
 
     if(inputOnOff === 'RESET') {
       if (inputField !== 'no filter') {
-        document.getElementById('assignee-input').style.pointerEvents = 'auto'
-        document.getElementById('assignee-input').style.backgroundColor='white'
-        document.getElementById('assignee-input').style.color = 'black'
-        document.getElementById('assignee-input').style.textTransform = 
-          'capitalize'
-        document.getElementById('assignee-input').value = ''
+        setInputStyle('input-ok')
       }
       setInputOnOff('OK')
       setSearch('')
@@ -122,12 +114,11 @@ const Mention = ({
     case 'mentions:USERNAME': 
       return <span>
         <form className='searchbar' onSubmit={handleSubmit}><input 
-          className='input-field'
-          id='mention-input'
+          className={`input-field ${inputStyle}`}
           placeholder='Enter mentioned username' 
           ref={(element) => mentionRef = element}
           onChange={inputFieldValue}
-        /><button className='OK-button'>{inputOnOff}
+        /><button className='button OK-button'>{inputOnOff}
         </button>
         </form>
       </span>

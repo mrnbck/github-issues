@@ -5,7 +5,8 @@ import QualifierChecker from '../QualifierChecker'
 const Milestone = ({ 
   qualifiers, 
   setQualifiers, 
-  milestoneToggle }) => {
+  milestoneToggle,
+  setMyIssues }) => {
 
   useEffect(() => {
     if (milestoneToggle === false) {
@@ -15,15 +16,16 @@ const Milestone = ({
       let regex = /milestone:([\w])+/
       const findEntry = qualifiers.filter(value => regex.exec(value))
       if (findEntry.length > 0) {
-        QualifierChecker(findEntry, qualifiers, setQualifiers, id)
+        QualifierChecker(findEntry, qualifiers, setQualifiers, id, setMyIssues)
       }
     }
     // eslint-disable-next-line
       },[milestoneToggle])
-
+  
   const [inputField, setInputField] = useState('')
   const [search, setSearch] = useState('')
   const [inputOnOff, setInputOnOff] = useState('OK')
+  const [inputStyle, setInputStyle] = useState('input-ok')
 
   //reset input fields when changing the field
   useEffect(() => {
@@ -74,14 +76,17 @@ const Milestone = ({
       (search !== '')
     ) {
       if (inputField !== 'no filter') {
-        document.getElementById('input-field').style.pointerEvents = 'none'
-        document.getElementById('input-field')
-          .style.backgroundColor='#fdfdfd'
-        document.getElementById('input-field').style.color = '#a6a6a6'
-        document.getElementById('input-field')
-          .style.textTransform='uppercase'
+        setInputStyle('input-reset')
         setInputOnOff('RESET') 
       }
+    }
+
+    if(inputOnOff === 'RESET') {
+      if (inputField !== 'no filter') {
+        setInputStyle('input-ok')
+      }
+      setInputOnOff('OK')
+      setSearch('')
     }
 
     //create regex based on value in "id"
@@ -98,22 +103,8 @@ const Milestone = ({
       return null
     })
 
+    QualifierChecker(findEntry, qualifiers, setQualifiers, id, setMyIssues)
 
-    QualifierChecker(findEntry, qualifiers, setQualifiers, id)
-
-    if(inputOnOff === 'RESET') {
-      if (inputField !== 'no filter') {
-        document.getElementById('input-field').style.pointerEvents = 'auto'
-        document.getElementById('input-field').style.backgroundColor='white'
-        document.getElementById('input-field').style.color = 'black'
-        document.getElementById('input-field').style.textTransform = 
-          'capitalize'
-        document.getElementById('input-field').value = ''
-      }
-      setInputOnOff('OK')
-      setSearch('')
-
-    }
   }
 
   //based on value in select show the correct input fields
@@ -122,12 +113,12 @@ const Milestone = ({
     case 'milestone:MILESTONE': 
       return <span>
         <form className='searchbar' onSubmit={handleSubmit}><input 
-          className='input-field'
+          className={`input-field ${inputStyle}`}
           id='input-field'
           placeholder='Enter milestone' 
           ref={(element) => inputRef = element}
           onChange={inputFieldValue}
-        /><button className='OK-button'>{inputOnOff}
+        /><button className='button OK-button'>{inputOnOff}
         </button>
         </form>
       </span>

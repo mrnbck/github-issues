@@ -33,6 +33,7 @@ import WhenUpdated from './input-qualifiers/WhenUpdated'
 import WhenClosed from './input-qualifiers/WhenClosed'
 import WhenMerged from './input-qualifiers/WhenMerged'
 
+
 const ExtendedSearch = ({ 
   qualifiers, setQualifiers, setMyIssues,
   baseUrl,filter, currentPage, setUrl, setOpen }) => {
@@ -69,22 +70,6 @@ const ExtendedSearch = ({
   const [whenClosedToggle, setWhenClosedToggle] = useState(false)
   const [whenMergedToggle, setWhenMergedToggle] = useState(false)
 
-  const inputOK = {
-    pointerEvents: 'auto',
-    backgroundColor: 'white',
-    color: 'black',
-    textTransform: 'capitalize'
-  }
-  
-  const inputReset = {    
-    pointerEvents: 'none',
-    backgroundColor: '#fdfdfd',
-    color: '#a6a6a6',
-    textTransform: 'uppercase' 
-  }
-
-  const [inputStyle, setInputStyle] = useState(inputOK)
-
   //reload every time qualifiers change
   useEffect(() => {
     if (qualifiers.length > 0 && filter !== '') {
@@ -106,6 +91,7 @@ const ExtendedSearch = ({
   return (
     <div style={styleWidth}>
       <h2>What would you like to search?</h2>
+
       <Archived
         qualifiers={qualifiers}
         setQualifiers={setQualifiers}
@@ -116,10 +102,6 @@ const ExtendedSearch = ({
         qualifiers={qualifiers}
         setQualifiers={setQualifiers}
         assigneeToggle={assigneeToggle}
-        inputStyle={inputStyle}
-        setInputStyle={setInputStyle}
-        inputOK={inputOK}
-        inputReset={inputReset}
         setMyIssues={setMyIssues} 
       />
 
@@ -172,6 +154,13 @@ const ExtendedSearch = ({
         setMyIssues={setMyIssues}
       />
 
+      <Label
+        qualifiers={qualifiers}
+        setQualifiers={setQualifiers}
+        labelToggle={labelToggle}
+        setMyIssues={setMyIssues} 
+      />
+
       <Language
         qualifiers={qualifiers}
         setQualifiers={setQualifiers}
@@ -184,13 +173,6 @@ const ExtendedSearch = ({
         setQualifiers={setQualifiers}
         linkedToggle={linkedToggle}
         setMyIssues={setMyIssues}
-      />
-
-      <Label
-        qualifiers={qualifiers}
-        setQualifiers={setQualifiers}
-        labelToggle={labelToggle}
-        setMyIssues={setMyIssues} 
       />
 
       <Locked
@@ -219,6 +201,7 @@ const ExtendedSearch = ({
         setQualifiers={setQualifiers}
         mentionToggle={mentionToggle}
         setMyIssues={setMyIssues}
+
       />
 
       <Milestone
@@ -295,10 +278,6 @@ const ExtendedSearch = ({
         qualifiers={qualifiers} 
         setQualifiers={setQualifiers}
         userOrOrgToggle={userOrOrgToggle}
-        inputStyle={inputStyle}
-        setInputStyle={setInputStyle}
-        inputOK={inputOK}
-        inputReset={inputReset}
         setMyIssues={setMyIssues} 
       />
 

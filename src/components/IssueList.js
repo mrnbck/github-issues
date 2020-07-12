@@ -29,7 +29,7 @@ const IssueList = ({
   //if (linkArray.length > 0) {
   //  link = linkArray[0].slice(0,linkArray[0].length-digits)}
   
-  const regex = /([^\d$])+/ /*get everything except the number at the end*/
+  const regex = /.+[^\d]/ /*get everything except the number at the end*/
 
   const link = url.match(regex)[0]
   

@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import QualifierChecker from '../QualifierChecker'
 
-const Locked = ({ qualifiers, setQualifiers, lockedToggle }) => {
+const Locked = ({ qualifiers, setQualifiers, lockedToggle, setMyIssues }) => {
 
   useEffect(() => {
     if (lockedToggle === false) {
@@ -18,10 +18,10 @@ const Locked = ({ qualifiers, setQualifiers, lockedToggle }) => {
         unlockedRegex.exec(value))
 
       if (findLocked.length > 0) {
-        QualifierChecker(findLocked, qualifiers, setQualifiers, id)
+        QualifierChecker(findLocked, qualifiers, setQualifiers, id, setMyIssues)
       }
       if (findUnlocked.length > 0) {
-        QualifierChecker(findUnlocked, qualifiers, setQualifiers, id)
+        QualifierChecker(findUnlocked, qualifiers, setQualifiers,id,setMyIssues)
       }
     }
     // eslint-disable-next-line
@@ -47,7 +47,7 @@ const Locked = ({ qualifiers, setQualifiers, lockedToggle }) => {
       return null
     })
 
-    QualifierChecker(findEntry, qualifiers, setQualifiers, id)
+    QualifierChecker(findEntry, qualifiers, setQualifiers, id, setMyIssues)
   }
 
   if (lockedToggle === false) {

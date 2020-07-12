@@ -5,7 +5,14 @@ import QualifierChecker from '../QualifierChecker'
 const Author = ({ 
   qualifiers, 
   setQualifiers, 
-  authorToggle }) => {
+  authorToggle,
+  setMyIssues }) => {
+
+  const [inputStyle, setInputStyle] = useState('input-ok')
+  const [inputField, setInputField] = useState('')
+  const [authorSearch, setAuthorSearch] = useState('')
+  const [intAccountSearch, setIntAccountSearch] = useState('')
+  const [inputOnOff, setInputOnOff] = useState('OK')
 
   useEffect(() => {
     if (authorToggle === false) {
@@ -17,22 +24,19 @@ const Author = ({
         
       const findAuthor = qualifiers.filter(value => authorRegex.exec(value))
       if (findAuthor.length > 0) {
-        QualifierChecker(findAuthor, qualifiers, setQualifiers, id)
+        QualifierChecker(findAuthor, qualifiers, setQualifiers, id, setMyIssues)
       } else {
         const intAccount = qualifiers.filter(value => 
           intAccountRegex.exec(value))
         if (intAccount.length > 0) {
-          QualifierChecker(intAccount, qualifiers, setQualifiers, id)
+          QualifierChecker(
+            intAccount, qualifiers, setQualifiers, id, setMyIssues
+          )
         }
       }
     }
     // eslint-disable-next-line
       },[authorToggle])  
-  
-  const [inputField, setInputField] = useState('')
-  const [authorSearch, setAuthorSearch] = useState('')
-  const [intAccountSearch, setIntAccountSearch] = useState('')
-  const [inputOnOff, setInputOnOff] = useState('OK')
 
   //reset input fields when changing the field
   useEffect(() => {
@@ -90,12 +94,17 @@ const Author = ({
       (authorSearch !== '' || intAccountSearch !== '')
     ) {
       if (inputField !== 'no filter') {
-        document.getElementById('author-input').style.pointerEvents = 'none'
-        document.getElementById('author-input').style.backgroundColor='#fdfdfd'
-        document.getElementById('author-input').style.color = '#a6a6a6'
-        document.getElementById('author-input').style.textTransform='uppercase'
+        setInputStyle('input-reset')
         setInputOnOff('RESET') 
       }
+    }
+
+    if(inputOnOff === 'RESET') {
+      if (inputField !== 'no filter') {
+        setInputStyle('input-ok')
+      }      
+      setInputOnOff('OK')
+      setAuthorSearch('')
     }
 
     //create regex based on value in "id"
@@ -115,21 +124,8 @@ const Author = ({
       return null
     })
 
-    QualifierChecker(findEntry, qualifiers, setQualifiers, id)
+    QualifierChecker(findEntry, qualifiers, setQualifiers, id, setMyIssues)
 
-    if(inputOnOff === 'RESET') {
-      if (inputField !== 'no filter') {
-        document.getElementById('author-input').style.pointerEvents = 'auto'
-        document.getElementById('author-input').style.backgroundColor = 'white'
-        document.getElementById('author-input').style.color = 'black'
-        document.getElementById('author-input').style.textTransform = 
-          'capitalize'
-        document.getElementById('author-input').value = ''
-      }
-      setInputOnOff('OK')
-      setAuthorSearch('')
-
-    }
   }
 
   //based on value in select show the correct input fields
@@ -138,24 +134,24 @@ const Author = ({
     case 'author:USERNAME': 
       return <span>
         <form className='searchbar' onSubmit={handleSubmit}><input 
-          className='input-field'
+          className={`input-field ${inputStyle}`}
           id='author-input'
           placeholder='Enter Author' 
           ref={(element) => authorRef = element}
           onChange={inputFieldValue}
-        /><button id='author-input-button' className='OK-button'>{inputOnOff}
+        /><button className='button OK-button'>{inputOnOff}
         </button>
         </form>
       </span>
     case 'author:app/USERNAME': 
       return <span>
         <form className='searchbar' onSubmit={handleSubmit}><input 
-          className='input-field'
+          className={`input-field ${inputStyle}`}
           id='author-input'
           placeholder='Enter Integration Account'
           ref={(element) => intAccountRef = element}
           onChange={inputFieldValue}
-        /><button className='OK-button'>{inputOnOff}
+        /><button className='button OK-button'>{inputOnOff}
         </button>
         </form>
       </span>

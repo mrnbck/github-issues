@@ -6,11 +6,12 @@ const Assignee = ({
   qualifiers, 
   setQualifiers, 
   assigneeToggle,
-  inputStyle,
-  setInputStyle, 
-  inputOK,
-  inputReset,
   setMyIssues }) => {
+    
+  const [inputStyle, setInputStyle] = useState('input-ok')
+  const [inputField, setInputField] = useState('')
+  const [search, setSearch] = useState('')
+  const [inputOnOff, setInputOnOff] = useState('OK')
 
   useEffect(() => {
     if (assigneeToggle === false) {
@@ -26,9 +27,7 @@ const Assignee = ({
     // eslint-disable-next-line
     },[assigneeToggle])
 
-  const [inputField, setInputField] = useState('')
-  const [search, setSearch] = useState('')
-  const [inputOnOff, setInputOnOff] = useState('OK')
+
 
   //reset input fields when changing the field
   useEffect(() => {
@@ -79,14 +78,14 @@ const Assignee = ({
       (search !== '')
     ) {
       if (inputField !== 'no filter') {
-        setInputStyle(inputReset)
+        setInputStyle('input-reset')
         setInputOnOff('RESET') 
       }
     }
 
     if(inputOnOff === 'RESET') {
       if (inputField !== 'no filter') {
-        setInputStyle(inputOK)
+        setInputStyle('input-ok')
       }
       setInputOnOff('OK')
       setSearch('')
@@ -107,10 +106,8 @@ const Assignee = ({
       return null
     })
 
-
     QualifierChecker(findEntry, qualifiers, setQualifiers, id, setMyIssues)
-
-
+    
   }
 
   //based on value in select show the correct input fields
@@ -119,10 +116,9 @@ const Assignee = ({
     case 'assignee:USERNAME': 
       return <span>
         <form className='searchbar' onSubmit={handleSubmit}><input 
-          className='input-field'
+          className={`input-field ${inputStyle}`}
           id='assignee-input'
           placeholder='Enter Assignee'
-          style={inputStyle} 
           ref={(element) => assigneeRef = element}
           onChange={inputFieldValue}
         /><button className='button OK-button'>{inputOnOff}

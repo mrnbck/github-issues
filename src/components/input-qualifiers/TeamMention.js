@@ -5,11 +5,13 @@ import QualifierChecker from '../QualifierChecker'
 const TeamMention = ({ 
   qualifiers, 
   setQualifiers, 
-  teamMentionToggle }) => {
+  teamMentionToggle,
+  setMyIssues }) => {
 
   const [inputField, setInputField] = useState('')
   const [search, setSearch] = useState('')
   const [inputOnOff, setInputOnOff] = useState('OK')
+  const [inputStyle, setInputStyle] = useState('input-ok')
 
   useEffect(() => {
     if (teamMentionToggle === false) {
@@ -19,7 +21,7 @@ const TeamMention = ({
       let regex = /team:([\w])+\/[\w]+/ 
       const findEntry = qualifiers.filter(value => regex.exec(value))
       if (findEntry.length > 0) {
-        QualifierChecker(findEntry, qualifiers, setQualifiers, id)
+        QualifierChecker(findEntry, qualifiers, setQualifiers, id, setMyIssues)
       }
     }
     // eslint-disable-next-line
@@ -74,25 +76,21 @@ const TeamMention = ({
       (search !== '')
     ) {
       if (inputField !== 'no filter') {
-        document.getElementById('team-input').style.pointerEvents='none'
-        document.getElementById('team-input')
-          .style.backgroundColor='#fdfdfd'
-        document.getElementById('team-input').style.color = '#a6a6a6'
-        document.getElementById('team-input')
-          .style.textTransform='uppercase'
-        document.getElementById('org-input').style.pointerEvents='none'
-        document.getElementById('org-input')
-          .style.backgroundColor='#fdfdfd'
-        document.getElementById('org-input').style.color = '#a6a6a6'
-        document.getElementById('org-input')
-          .style.textTransform='uppercase'
+        setInputStyle('input-reset')
         setInputOnOff('RESET') 
       }
     }
 
+    if(inputOnOff === 'RESET') {
+      if (inputField !== 'no filter') {
+        setInputStyle('input-ok')
+      }
+      setInputOnOff('OK')
+      setSearch('')
+    }
+
     //create regex based on value in "id"
     let regex = /team:([\w])+\/[\w]+/        
-
 
     //search in qualifiers if current qualifier already exists
     //check both regex since the key is different every time
@@ -105,29 +103,8 @@ const TeamMention = ({
     })
     //console.log('findEntry',findEntry)
 
-    QualifierChecker(findEntry, qualifiers, setQualifiers, id)
+    QualifierChecker(findEntry, qualifiers, setQualifiers, id, setMyIssues)
 
-    if(inputOnOff === 'RESET') {
-      if (inputField !== 'no filter') {
-        document.getElementById('team-input').style.pointerEvents ='auto'
-        document.getElementById('team-input')
-          .style.backgroundColor='white'
-        document.getElementById('team-input').style.color = 'black'
-        document.getElementById('team-input').style.textTransform = 
-          'capitalize'
-        document.getElementById('team-input').value = ''
-        document.getElementById('org-input').style.pointerEvents ='auto'
-        document.getElementById('org-input')
-          .style.backgroundColor='white'
-        document.getElementById('org-input').style.color = 'black'
-        document.getElementById('org-input').style.textTransform = 
-          'capitalize'
-        document.getElementById('org-input').value = ''
-      }
-      setInputOnOff('OK')
-      setSearch('')
-
-    }
   }
 
   //based on value in select show the correct input fields
@@ -137,20 +114,20 @@ const TeamMention = ({
       return <span>
         <form className='searchbar' onSubmit={handleSubmit}>
           <input 
-            className='input-field'
+            className={`input-field ${inputStyle}`}
             id='org-input'
             placeholder='Enter organization' 
             ref={(element) => orgRef = element}
             onChange={inputFieldValue}
           />
           <input 
-            className='input-field'
+            className={`input-field ${inputStyle}`}
             id='team-input'
             placeholder='Enter team' 
             ref={(element) => teamRef = element}
             onChange={inputFieldValue}
           />
-          <button className='OK-button'>{inputOnOff}
+          <button className='button OK-button'>{inputOnOff}
           </button>
         </form>
       </span>

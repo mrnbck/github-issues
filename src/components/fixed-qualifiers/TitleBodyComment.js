@@ -5,7 +5,8 @@ import QualifierChecker from '../QualifierChecker'
 const TitleBodyComment = ({ 
   qualifiers, 
   setQualifiers, 
-  titleBodyCommentToggle }) => {
+  titleBodyCommentToggle,
+  setMyIssues }) => {
 
   useEffect(() => {
     if (titleBodyCommentToggle === false) {
@@ -15,7 +16,7 @@ const TitleBodyComment = ({
       let  regex = /in:([\w])+/
       const findEntry = qualifiers.filter(value => regex.exec(value))
       if (findEntry.length > 0) {
-        QualifierChecker(findEntry, qualifiers, setQualifiers, id)
+        QualifierChecker(findEntry, qualifiers, setQualifiers, id, setMyIssues)
       }
     }
     // eslint-disable-next-line
@@ -36,7 +37,7 @@ const TitleBodyComment = ({
     const findEntry = qualifiers.filter(value => regex.exec(value))
     console.log(findEntry)
 
-    QualifierChecker(findEntry, qualifiers, setQualifiers, id)
+    QualifierChecker(findEntry, qualifiers, setQualifiers, id, setMyIssues)
   }
 
   if (titleBodyCommentToggle === false) {
