@@ -215,32 +215,38 @@ const QualifierPicker = ({
         "quickinfo": "You can filter pull requests based on the branch they "+
         "came from (the \"head\" branch) or the branch they are merging into"+
         " (the \"base\" branch)." },
-      { "name": "Search by Commit Status",
-        "toggle": commitStatusToggle,
-        "setToggle": setCommitStatusToggle,
-        "quickinfo": "You can filter pull requests based on the status of the "+
-        "commits." },
       { "name": "Search by Commenter",
         "toggle": commenterToggle,
         "setToggle": setCommenterToggle,
         "quickinfo": "The commenter qualifier finds issues that contain a "+
         "comment from a certain user." },
+      { "name": "Search by Commit Status",
+        "toggle": commitStatusToggle,
+        "setToggle": setCommitStatusToggle,
+        "quickinfo": "You can filter pull requests based on the status of the "+
+        "commits." },
       { "name": "Search by Draft Pull Requests",
         "toggle": draftToggle,
         "setToggle": setDraftToggle,
         "quickinfo": "You can filter for draft pull requests." },
-      { "name": "Search by Issues or Pull Requests",
-        "toggle": issueOrPrToggle,
-        "setToggle": setIssueOrPrToggle,
-        "quickinfo": "By default, GitHub search will return both issues and "+
-        "pull requests. However, you can restrict search results to just"+
-        "issues or pull requests using this toggle." },
       { "name": "Search by Involved User",
         "toggle": involvesToggle,
         "setToggle": setInvolvesToggle,
         "quickinfo": "You can use this qualifier to find issues and pull "+
         "requests that were either created by a certain user, assigned to "+
         "that user, mention that user, or were commented on by that user." },
+      { "name": "Search by Issues or Pull Requests",
+        "toggle": issueOrPrToggle,
+        "setToggle": setIssueOrPrToggle,
+        "quickinfo": "By default, GitHub search will return both issues and "+
+        "pull requests. However, you can restrict search results to just"+
+        "issues or pull requests using this toggle." },
+      { "name": "Search by Labels",
+        "toggle": labelToggle,
+        "setToggle": setLabelToggle,
+        "quickinfo": "You can narrow your results by labels, using the label "+
+        "qualifier. If you select multiple labels, all labels must be present,"+
+        " not any of them (AND not OR)."  },
       { "name": "Search by Language",
         "toggle": languageToggle,
         "setToggle": setLanguageToggle,
@@ -259,22 +265,6 @@ const QualifierPicker = ({
         "setToggle": setLockedToggle,
         "quickinfo": "You can search for an issue or pull request that has "+
         "a locked conversation" },
-      { "name": "Search by Labels",
-        "toggle": labelToggle,
-        "setToggle": setLabelToggle,
-        "quickinfo": "You can narrow your results by labels, using the label "+
-        "qualifier. If you select multiple labels, all labels must be present,"+
-        " not any of them (AND not OR)."  },
-      { "name": "Search by Missing Metadata",
-        "toggle": metadataToggle,
-        "setToggle": setMetadataToggle,
-        "quickinfo": "You can narrow your search to issues and pull requests "+
-        "that are missing certain metadata. That "+
-        "metadata includes Labels, Milestones, Assignees and Projects" },
-      /*{ "name": "Public or Private",
-        "toggle": publicOrPrivateToggle,
-        "setToggle": setPublicOrPrivateToggle
-      },*/      
       { "name": "Search by Mention",
         "toggle": mentionToggle,
         "setToggle": setMentionToggle,
@@ -290,6 +280,16 @@ const QualifierPicker = ({
         "setToggle": setMilestoneToggle,
         "quickinfo": "The milestone qualifier finds issues or pull requests "+
         "that are a part of a milestone within a repository." },
+      { "name": "Search by Missing Metadata",
+        "toggle": metadataToggle,
+        "setToggle": setMetadataToggle,
+        "quickinfo": "You can narrow your search to issues and pull requests "+
+        "that are missing certain metadata. That "+
+        "metadata includes Labels, Milestones, Assignees and Projects" },
+      /*{ "name": "Public or Private",
+        "toggle": publicOrPrivateToggle,
+        "setToggle": setPublicOrPrivateToggle
+      },*/      
       { "name": "Search by Number of Comments",
         "toggle": numOfCommentsToggle,
         "setToggle": setNumOfCommentsToggle,
@@ -350,11 +350,6 @@ const QualifierPicker = ({
         "toggle": whenCreatedToggle,
         "setToggle": setWhenCreatedToggle,
         "quickinfo": "You can filter issues based on times of creation" },
-      { "name": "Search by When Updated",
-        "toggle": whenUpdatedToggle,
-        "setToggle": setWhenUpdatedToggle,
-        "quickinfo": "You can filter issues based on when they were last "+
-        "updated." },
       { "name": "Search by When Closed",
         "toggle": whenClosedToggle,
         "setToggle": setWhenClosedToggle,
@@ -365,7 +360,12 @@ const QualifierPicker = ({
         "setToggle": setWhenMergedToggle,
         "quickinfo": "You can filter pull requests based on when they were "+
         "merged."
-      },
+      },      
+      { "name": "Search by When Updated",
+        "toggle": whenUpdatedToggle,
+        "setToggle": setWhenUpdatedToggle,
+        "quickinfo": "You can filter issues based on when they were last "+
+      "updated." },
     ]
   }
 

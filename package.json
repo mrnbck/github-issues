@@ -1,4 +1,5 @@
 {
+  "homepage": "https://mrnbck.github.io/github-issues/",
   "name": "github",
   "version": "0.1.0",
   "private": true,
@@ -23,7 +24,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "proxy": "http://localhost:3001",
   "eslintConfig": {
@@ -43,6 +46,7 @@
   },
   "devDependencies": {
     "eslint": "^6.8.0",
-    "eslint-plugin-react": "^7.20.3"
+    "eslint-plugin-react": "^7.20.3",
+    "gh-pages": "^3.1.0"
   }
 }

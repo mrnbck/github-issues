@@ -37,11 +37,15 @@ const Navigation = ({
         <span>
           <Router>
             <Route exact path={'/my-issues/:currentPage'} 
-              render={() => 
+              render={({ match }) => 
                 <MyIssues 
                   setShowIssue={setShowIssue}
                   issues={issues}
                   setIssue={setIssue}
+                  page={Number(match.params.currentPage)}
+                  url={url}
+                  setUrl={setUrl}
+                  currentPage={currentPage}
                 />}
             />
             <Route exact path={'/issues/id/:id'}

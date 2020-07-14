@@ -9,8 +9,8 @@ const convertDate = (createdAt, noTime) => {
   const day = date[2]
   const time = date[3]
   if (noTime) {
-    return `${year} ${month} ${day}`
-  } else return `${year} ${month} ${day} at ${time}`
+    return `${month} ${day} ${year}`
+  } else return `${month} ${day} ${year} at ${time}`
 }
 
 export default convertDate

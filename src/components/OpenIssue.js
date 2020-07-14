@@ -20,38 +20,6 @@ const OpenIssue = ({
   const [newComment, setNewComment] = useState('')
   const [user, setUser] = useState('')
   
-  const styleLoginButton = {
-    marginLeft: '20px'
-  }
-
-  const styleIssueState = {
-    backgroundColor: '#28a745',
-    padding: '5px 15px',
-    fontWeight: 'bold',
-    borderRadius: '15px',
-    color: 'white',
-    marginRight: '10px',
-    height: '18px',
-    lineHeight: '20px',
-    textTransform: 'uppercase'
-  }
-
-  const styleIssueHeader = {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center'
-  }
-
-  const styleFontColor = {
-    color: '#808080'
-  }
-
-  const styleRefreshIcon = {
-    textAlign: 'end',
-    marginBottom: '20px',
-    cursor: 'pointer'
-  }
-
   const fetchComments = async () => {
     //check here if the user is already logged in. 
     
@@ -170,12 +138,12 @@ const OpenIssue = ({
           <i className="fas fa-arrow-left go-back"
             onClick={() => close() }></i>
           <h1>{issue.title} #{issue.number}</h1>
-          <div style={styleIssueHeader}>
-            <span style={styleIssueState}>{issue.state}</span>
-            <span style={styleFontColor}>
-              {issue.user.login} opened this issue on&nbsp;
+          <div className='issue-header'>
+            <span className='issue-state-open'>{issue.state}</span>
+            <span className='font-color-grey'>
+            &nbsp;{issue.user.login} opened this issue on&nbsp;
               {convertDate(issue.created_at, 'noTime')} |&nbsp;
-              {issue.comments} {issue.comments > 1 ? 'comments' : 'comment'}
+              {issue.comments} {issue.comments !== 1 ? 'comments' : 'comment'}
             </span>
             <a href={issue.html_url} 
               target="_blank" 
@@ -189,13 +157,14 @@ const OpenIssue = ({
                 <ReactMarkdown source={issue.body} />
               </div>
               <div>
-                <div>{<ShowComments   
-                  setCommentsList={setCommentsList} 
-                  commentsList={commentsList}
-                  user={user}
-                />}
+                <div>
+                  {<ShowComments   
+                    setCommentsList={setCommentsList} 
+                    commentsList={commentsList}
+                    user={user}
+                  />}
                 </div>
-                <div style={styleRefreshIcon} onClick={() => fetchComments()}>
+                <div className='refresh-icon' onClick={() => fetchComments()}>
                   <i className="fas fa-sync"></i>
                 </div>
               </div>                    
@@ -206,14 +175,12 @@ const OpenIssue = ({
                   <Router>
                     <Link to='/login'>        
                       <button 
-                        style={styleLoginButton} 
+                        style={{ marginLeft: '20px' }}
                         className='button login-button'
                         onClick={handleLogin}>Login
                       </button>
                     </Link>
                   </Router>
-                  
-
                 </div>) :
               //if user is logged in show comment box.
                 (<div className='comments-container'>
@@ -234,16 +201,16 @@ const OpenIssue = ({
               </button>
             </div>  
             <div className='sidebar'>
-              <div style={styleFontColor}>Assigned To: </div>
+              <div className='font-color-grey'>Assigned To: </div>
               <div className='metadata'>{issue.assignee ? 
                 issue.assignee.login : 'None'}                
               </div>
-              <div style={styleFontColor}>Labels </div>
+              <div className='font-color-grey'>Labels </div>
               <div className='metadata'>{issue.labels.length > 0 ? 
-                issue.labels.map(label => {
-                  return label.name}) : 'None'}
+                issue.labels.map((label,index) => {
+                  return <div key={index}>{label.name}</div>}) : 'None'}
               </div>
-              <div style={styleFontColor}>Milestone </div>
+              <div className='font-color-grey'>Milestone </div>
               <div className='metadata'>{issue.milestone ? 
                 issue.milestone.title : 'None'}</div>
             </div>

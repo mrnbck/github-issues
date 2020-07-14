@@ -8,7 +8,7 @@ app.use(express.static('build'))
 app.use(bodyParser.json())
 
 var corsOptions = {
-  origin: 'http://localhost:3000',
+  origin: 'https://mrnbck.github.io/github-issues/', // http://localhost:3000',
   optionsSuccessStatus: 200, // some  browsers choke on 204
   credentials: true
 }

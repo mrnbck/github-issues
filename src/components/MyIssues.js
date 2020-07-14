@@ -1,21 +1,23 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { 
-  BrowserRouter as Router, Link, useHistory } from 'react-router-dom'
+  BrowserRouter as Router, Link } from 'react-router-dom'
+import ShowIssues from './ShowIssues'
 
 const MyIssues = ({ 
-  issues, setIssue, 
-  setShowIssue }) => {
+  issues, setIssue, page, url, setUrl, currentPage, setShowIssue }) => {
 
-  const history = useHistory()
+  const regex = /.+[^\d]/ /*get everything except the number at the end*/
+  const link = url.match(regex)[0]
+    
+  useEffect(() => {
 
-  const openIssue = (issue) => {
-    //useState to make the issue available to move it to the next component
-    setIssue(issue)
-    setShowIssue(true)
-    history.push(`../issues/id/${issue.id}`)
-  }
-
+    if (link.length > 0 && Number(page)>0) {
+      setUrl(link+currentPage) 
+    }    
+    // eslint-disable-next-line
+    },[currentPage])
+  
   if (issues[0] === 'login') {
     
     const handleLogin = async (event) => {
@@ -36,10 +38,6 @@ const MyIssues = ({
       }
     }
 
-    const styleLoginButton = {
-      marginTop: '30px'
-    }
-
     return (
     //if the user is not logged in yet, show Login button
       <div className='containers'>
@@ -47,8 +45,8 @@ const MyIssues = ({
         <Router>
           <Link to='/login'>        
             <button 
-              style={styleLoginButton}
-              className='close-button'
+              style={{ marginTop: '30px' }}
+              className='button login-button'
               onClick={handleLogin}>Login
             </button>
           </Link>
@@ -57,17 +55,11 @@ const MyIssues = ({
   } else 
 
     return (
-      <div className='issue-list'>
-        <h3>My Issues</h3>      
-        <div>{issues.map(issue => 
-          (<div 
-            key={issue.id} 
-            className='issue-list-item' 
-            onClick={() => openIssue(issue) }>
-            {issue.title}
-          </div>))}
-        </div>
-      </div>
+      <div><ShowIssues 
+        setIssue = {setIssue}
+        setShowIssue = {setShowIssue}
+        issues = {issues}
+      /></div>
     )
   
 }

@@ -2,12 +2,22 @@ body { padding: 0; margin: 0; box-sizing: border-box; font-family: 'Roboto', san
 ul { padding: 0; }
 h2 { color: #252525; margin: 30px 15px; }
 h3 { color: #252525; }
+img { max-width: 720px }
+pre { overflow: auto; }
 textarea { box-sizing: border-box; border: 1px solid #cbcbcb; margin-bottom: 10px; border-radius: 4px; padding: 10px; height: 100px; width: 100%; resize: vertical; }
 .menu { position: fixed; display: flex; flex-wrap: nowrap; width: 100%; overflow-x: hidden; flex-direction: row; background-color: #252525; color: #fdf6f6; padding: 15px; align-items: center; z-index: 2; }
 .menu-searchbar { display: flex; flex-direction: row; align-items: center; flex-wrap: noWrap; }
 .search-input { width: 200px; line-height: 20px; padding: 6px; font-size: 14px; margin-left: 20px; padding-left: 10px; outline: none; border: none }
-.issue-list { width: 75%; margin: 0px auto 60px; border-bottom: 1px solid #cbcbcb; }
-.issue-list-item { padding: 20px; border: 1px solid #cbcbcb; border-bottom: none; color: #252525 }
+.issue-list { width: 75%; margin: 45px auto 60px; border-bottom: 1px solid #dadada; font-size: 16px; font-weight: 500;}
+.issue-list-item { padding: 20px; border: 1px solid #dadada; border-bottom: none; color: #252525; background-color: #ddd; margin-bottom: 3px; }
+.issue-header { display: flex; flex-direction: row; align-items: center }
+.issue-state-open, .issue-state-closed, .issue-list-label, .issue-comments { background-color: #28a745; padding: 5px 10px; border-radius: 15px; color: white; margin: 0px 2px 0px 3px; text-transform: lowercase }
+.issue-state-closed { background-color: #cc0000 }
+.issue-list-label { background-color: #0366d6; }
+.issue-list-repo { color: #505050; padding-right: 10px; font-weight: 600; }
+.issue-list-user { font-size: 12px; color: #808080; font-weight: 400; margin-top: 8px; }
+.issue-comments { background-color: #b3b300 }
+.issue-title { cursor: pointer; }
 .pagination { display: inline-block; color: #4f758b; background-color: #fdf6f6; padding: 10px; width: 20px; height: 20px; line-height: 20px; border: 1px solid #cbcbcb; border-right: none; text-decoration: none; text-align: center; cursor: pointer}
 .pagination:hover { background-color: #ddd; height: 18px; }
 .previous-next { display: inline-block; color: #4f758b; background-color: #fdf6f6; padding: 10px; height: 20px; line-height: 20px; border: 1px solid #cbcbcb; text-decoration: none; text-align: center; cursor: pointer}
@@ -37,8 +47,13 @@ textarea { box-sizing: border-box; border: 1px solid #cbcbcb; margin-bottom: 10p
 .OK-button { color: white; font-weight: bold; left: -11px; width: min-content; height: 23px; border-style: none; padding: 0 5px; border-radius: 0px; }
 .plus-button { left: 15px; text-align: center; line-height: 33px; font-size: 18px; transition: 0.3s;}
 .back-button, .close-button, .comment-button, .login-button, .cancel-button { width: min-content; line-height: 33px; font-size: 18px; border-style: none; padding: 0 25px; transition: 0.3s;}
-.cancel-button {background-color: #808080 }
-#label-button { position: relative; background-color: #252525; color: white; font-weight: bold; margin-left: 10px; margin-top: 5px; height: 23px; border-style: none; padding: 0 5px; }
+.cancel-button, .update-button {background-color: #808080; visibility: hidden; height: 0px; align-self: end; margin-right: 10px; }
+.update-button { background-color: #252525;}
+.comment-top-bar { display: flex; flex-direction: row; justify-content: flex-end; }
+.comment-header { border-bottom: 1px solid #cbcbcb; padding: 10px; display: flex; justify-content: space-between; background-color: #dcdcdc; }
+.no-comments { margin: 30px 0px; padding: 30px; border: 1px solid #cbcbcb; }
+.comments-padding {  padding: 5px 25px 15px }
+#label-button { position: relative; background-color: #252525; color: white; font-weight: 700; margin-left: 10px; margin-top: 5px; height: 23px; border-style: none; padding: 0 5px; }
 .On-Off-Button { display: flex; flex-direction: row; align-content: center; margin-bottom: 20px; align-items: center }
 .button:active, #label-button:active { transform: translateY(1px); }
 .button:hover, #label-button:hover { background-color: #3a3a3a; transition: 0.3s; }
@@ -53,7 +68,8 @@ textarea { box-sizing: border-box; border: 1px solid #cbcbcb; margin-bottom: 10p
 .quickinfo:hover .tooltiptext { visibility: visible; }
 .quickinfo:hover::before { content: " "; position: absolute; left: 446px; border-width: 12px; border-style: solid; border-color: transparent transparent transparent #353535; margin-left: 1px;}
 .hovercard { display: flex; flex-direction: column; justify-content: flex-start; background-color: #353535; padding: 10px; border-radius: 6px; color: white; width: 200px; line-height: 15px;}
-
+.refresh-icon { text-align: end; margin-bottom: 20px; cursor: pointer; }
+.refresh-icon:hover, .font-color-grey { color: #808080}
 .issue-main { width: 85%; }
 .qualifier-list-header { font-size: 20px; color: white; margin-top: 0; margin-bottom: 30px; }
 .switch input /* Hide default HTML checkbox */ { display: flex; margin: 0; opacity: 0; width: 0; height: 0; }
@@ -78,7 +94,9 @@ input:checked+.slider:before { -webkit-transform: translateX(21px); transform: t
 .comment-icon:hover { color: #808080; transition: 0.3s}
 .picker-top-bar { display: flex; flex-direction: row; justify-content: space-between; } 
 .picker-search { height: 20px; line-height: 20px; padding-left: 15px; }
-.metadata { margin: 10px 0; }
+.metadata { margin-top: 5px; margin-bottom: 15px}
+.summary { display: list-item }
+
 
 @media only screen and (max-width: 600px) {
   #qualifier-picker { max-width: 350px; }

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { useHistory } from 'react-router-dom'
+import ShowIssues from './ShowIssues'
 
 
 const IssueList = ({ 
@@ -46,27 +46,12 @@ const IssueList = ({
     // eslint-disable-next-line
   },[currentPage])
 
-  const history = useHistory()
-
-  const openIssue = (issue) => {
-    //useState to make the issue available to move it to the next component
-    setIssue(issue)
-    setShowIssue(true)
-    history.push(`id/${issue.id}`)
-  }
-
   return (
-    <div className='issue-list'>
-      <h3>Issues</h3>      
-      <div>{issues.map(issue => 
-        (<div 
-          key={issue.id} 
-          className='issue-list-item' 
-          onClick={() => openIssue(issue) }>
-          {issue.title}
-        </div>))}
-      </div>
-    </div>
+    <div><ShowIssues 
+      setIssue = {setIssue}
+      setShowIssue = {setShowIssue}
+      issues = {issues}
+    /></div>
   )
 }  
 
