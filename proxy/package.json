@@ -1,0 +1,20 @@
+{
+  "homepage": "https://mrnbck.github.io/github-issues/",
+  "name": "proxy",
+  "version": "1.0.0",
+  "description": "proxy to avoid CORS",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "server": "nodemon index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "nodemon": "^2.0.4"
+  }
+}
