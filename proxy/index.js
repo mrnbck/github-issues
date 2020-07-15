@@ -4,16 +4,16 @@ const bodyParser = require('body-parser')
 const axios = require('axios')
 const cors = require('cors')
 const app = express()
-app.use(express.static('build'))
+
 app.use(bodyParser.json())
 
 var corsOptions = {
-  origin: 'https://mrnbck.github.io/', // http://localhost:3000',
+  origin: 'https://infinite-stream-95019.herokuapp.com/',
   optionsSuccessStatus: 200, // some  browsers choke on 204
   credentials: true
 }
-
 app.use(cors(corsOptions))
+app.use(express.static('build'))
 
 app.get('/api/login', async (req, res) => {
   // eslint-disable-next-line no-unused-vars
@@ -51,8 +51,8 @@ app.get('/api/oauth-token/:code/:state', async (req, res) => {
         { httpOnly: true, path: '/', secure: true, sameSite: 'lax' })
       //res.setHeader('Set-Cookie', 
       //  [`user_session=${token}; Path=/; secure; HttpOnly; SameSite=Lax`])
-      res.setHeader('Access-Control-Allow-Credentials', true)
-      res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000')
+      //res.setHeader('Access-Control-Allow-Credentials', true)
+      //res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000')
 
       res.send(token)
     } 
@@ -84,8 +84,8 @@ app.get('/api/issues/:query', async (req, res) => {
       const data = result.data
       console.log('Rate Limit remaining', 
         result.headers['x-ratelimit-remaining'])
-      res.setHeader('Access-Control-Allow-Credentials', true)
-      res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000')
+      //res.setHeader('Access-Control-Allow-Credentials', true)
+      //res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000')
       res.status(200)
       res.send(data)
     } 
@@ -269,7 +269,7 @@ const unknownEndpoint = (request, response) => {
 
 app.use(unknownEndpoint)
 
-const PORT = 3001
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
