@@ -90,7 +90,8 @@ const ShowComments = ({
   } else return (
     <div>
       <ul>{commentsList.map((comment, index) => {
-        return (              
+        return (
+          //if comment.type === 'commit' 
           <li className='comments-list' key={index}>
             <div className='comment-header'>
               <span><b>{comment.user.login}</b> on&nbsp;
@@ -101,6 +102,7 @@ const ShowComments = ({
                   <i>&#40;edited&#41;</i>:''}</span>
               <span>
               </span>
+              <span>{comment.type}</span>
               <span>
                 {user===comment.user.login && comment.url ? (
                   <span>

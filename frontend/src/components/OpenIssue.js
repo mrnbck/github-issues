@@ -28,16 +28,61 @@ const OpenIssue = ({
     const fetchUser = async () => {
       try {
         const user = await axios(url, { withCredentials: 'true' })
-        setUser(user.data)
-        setLogin(true)
+        
+        if (user.data) {
+          setUser(user.data)
+          setLogin(true)
+        }
       } catch(error) {
         console.log(error)
       }
     }
     fetchUser()
 
-    const promise = await axios.get(issue.comments_url)
-    setCommentsList(promise.data)
+    const issueComments = await axios.get(issue.comments_url)
+        
+    if (issue.pull_request) {
+      const pullUrl = issue.pull_request.url+'/comments'    
+      const pullComments = await axios.get(pullUrl)
+    
+      const commitsUrl = issue.pull_request.url+'/commits' 
+      const commits = await axios.get(commitsUrl)
+      const commitMessages = commits.data.map(commit => {
+        if (commit.author !== null && commit.commit.message && commit.url) {
+          try {
+            const commitObject = {
+              user: {
+                login: commit.author.login
+              },
+              created_at: commit.commit.author.date,
+              updated_at: commit.commit.author.date,
+              body: commit.commit.message,
+              url: commit.url,
+              type: 'commit'
+            } 
+            return commitObject
+          } catch(error) {
+            console.log(error)
+          }
+        }})
+
+      if (commitMessages[0] !== undefined) {
+        setCommentsList(issueComments.data
+          .concat(pullComments.data, commitMessages).sort((a,b) => {
+          //console.log(new Date(a.created_at) - new Date(b.created_at))
+            return new Date(a.created_at) - new Date(b.created_at)
+          } ) 
+        ) }
+      else {
+        setCommentsList(issueComments.data
+          .concat(pullComments.data).sort((a,b) => {
+            //console.log(new Date(a.created_at) - new Date(b.created_at))
+            return new Date(a.created_at) - new Date(b.created_at)
+          } ) 
+        )
+      } 
+    }
+    else setCommentsList(issueComments.data)    
   }
 
   //refresh issue when opening
@@ -80,6 +125,7 @@ const OpenIssue = ({
       myIssues ? 
         history.push(`/my-issues/${currentPage}`) : 
         history.push(`/issues/${currentPage}`)
+        
     }
 
     const handleSubmitComment = async () => {
@@ -131,7 +177,7 @@ const OpenIssue = ({
       )*/
       window.location.assign(url)
     }
-     
+
     return (
       <div>
         <div className='display-issue'>
@@ -143,7 +189,7 @@ const OpenIssue = ({
             <span className='font-color-grey'>
             &nbsp;{issue.user.login} opened this issue on&nbsp;
               {convertDate(issue.created_at, 'noTime')} |&nbsp;
-              {issue.comments} {issue.comments !== 1 ? 'comments' : 'comment'}
+              Comments: {issue.comments} 
             </span>
             <a href={issue.html_url} 
               target="_blank" 

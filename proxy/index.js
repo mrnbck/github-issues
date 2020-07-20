@@ -2,18 +2,12 @@ require('dotenv').config()
 const express = require('express')
 const bodyParser = require('body-parser')
 const axios = require('axios')
+const path = require('path')
 const cors = require('cors')
 const app = express()
 
 app.use(bodyParser.json())
-
-var corsOptions = {
-  origin: 'https://infinite-stream-95019.herokuapp.com/',
-  optionsSuccessStatus: 200, // some  browsers choke on 204
-  credentials: true
-}
-app.use(cors(corsOptions))
-app.use(express.static('build'))
+app.use(bodyParser.urlencoded({ extended: true }))
 
 app.get('/api/login', async (req, res) => {
   // eslint-disable-next-line no-unused-vars
@@ -68,14 +62,16 @@ app.get('/api/issues/:query', async (req, res) => {
   const query = req.params.query
   const url = 'https://api.github.com/search/issues?q='
   const fullUrl = url + query
-  
+
   const regex=/user_session=([^;]+)/
-  if (req.headers.cookie) {
+  
+  if (req.headers.cookie.match(regex) !== null) {
+    
     const user_session = req.headers.cookie.match(regex)[1]
 
     const config = {
       headers: { authorization: 'token ' + user_session },
-    }
+    }        
     try {
       const result = await axios.get(fullUrl, config)
       //console.log('headers', result.headers)
@@ -84,20 +80,19 @@ app.get('/api/issues/:query', async (req, res) => {
       const data = result.data
       console.log('Rate Limit remaining', 
         result.headers['x-ratelimit-remaining'])
-      //res.setHeader('Access-Control-Allow-Credentials', true)
-      //res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000')
       res.status(200)
       res.send(data)
-    } 
-    catch (error) {
+    } catch (error) {
       console.log(error)
       res.sendStatus(error.response.status)
     }
-  }
+  } 
   else {
     try {
       const result = await axios.get(fullUrl)
       const data = result.data
+      console.log('Rate Limit remaining', 
+        result.headers['x-ratelimit-remaining'])
       res.status(200)
       res.send(data)
     } 
@@ -105,12 +100,14 @@ app.get('/api/issues/:query', async (req, res) => {
       console.log(error)
       res.sendStatus(error.response.status)
     }
-  }  
+  } 
 })
 
 app.get('/api/my-issues/:id', async (req, res) => {
+  
   const regex=/user_session=([^;]+)/
-  if(req.headers.cookie) {
+
+  if (req.headers.cookie.match(regex) !== null) {
     const user_session = req.headers.cookie.match(regex)[1]
 
     const config = {
@@ -127,7 +124,7 @@ app.get('/api/my-issues/:id', async (req, res) => {
     } catch(error) {
       console.log('My Issues', error.response.status, '-', 
         error.response.statusText)
-
+      res.status(error.response.status)
       res.send(error.error)
     }
 
@@ -153,38 +150,37 @@ app.get('/api/checkLogin', async (req, res) => {
   
   const regex=/user_session=([^;]+)/
 
-  if(req.headers.cookie) {
-    const user_session = req.headers.cookie.match(regex)[1]
+  if (req.headers.cookie.match(regex) !== null) {
 
-    //no longer needed because I set it globally?
-    //res.setHeader('Access-Control-Allow-Credentials', true)
-    //res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000')
-
-    if (user_session) {
-      res.send('true')
-    } else res.send('false') }
-
-  else res.send('false')
-})
+    res.status(200)
+    res.send('true')
+  } else {
+    res.status(202).send('false')
+  }
+}
+)
+    
 
 app.get('/api/user', async (req, res) => {
 
   const regex=/user_session=([^;]+)/
-  const user_session = req.headers.cookie.match(regex)[1]
+  if (req.headers.cookie.match(regex) !== null) {
+    const user_session = req.headers.cookie.match(regex)[1]
 
-  const config = {
-    headers: { authorization: 'token ' + user_session },
-  }
-  try {
-    const user = await axios.get('https://api.github.com/user', config)
-    const data = user.data
+    const config = {
+      headers: { authorization: 'token ' + user_session },
+    }
+    try {
+      const user = await axios.get('https://api.github.com/user', config)
+      const data = user.data
     
-    res.status(200)
-    res.send(data.login) 
-  } catch(error) {
-    console.log(error)
-    res.sendStatus(error.response.status)
-  }
+      res.status(200)
+      res.send(data.login) 
+    } catch(error) {
+      console.log(error)
+      res.sendStatus(error.response.status)
+    }
+  } else res.status(202).send('false')
 })
 
 app.post('/api/repos/:owner/:repo/issues/:id/comments', async (req,res) => {
@@ -261,6 +257,32 @@ app.delete('/api/repos/:owner/:repo/issues/comments/:id', async (req,res) => {
     res.sendStatus(400)
   }
 })
+
+if (process.env.NODE_ENV === 'production') {
+  var corsOptions = {
+    origin: 'https://infinite-stream-95019.herokuapp.com/',
+    optionsSuccessStatus: 200, // some  browsers choke on 204
+    credentials: true
+  }
+  app.use(cors(corsOptions))
+ 
+  // Serve any static files
+  app.use(express.static(path.join(__dirname, 'client/build')))
+  // Handle React routing, return all requests to React app
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'client/build', 'index.html'))
+  })
+} else {
+
+  // eslint-disable-next-line no-redeclare
+  var corsOptions = {
+    origin: 'http://localhost:3000',
+    optionsSuccessStatus: 200, // some  browsers choke on 204
+    credentials: true
+  }
+  app.use(cors(corsOptions))
+  
+}
 
 const unknownEndpoint = (request, response) => {
   console.log(request.url)

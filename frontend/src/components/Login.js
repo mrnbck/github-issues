@@ -9,11 +9,9 @@ const Login = () => {
   const getToken = async (code) => {
 
     try {
-      const response = await 
-      fetch(`/api/oauth-token/${code}/${state}`, {
+      await fetch(`/api/oauth-token/${code}/${state}`, {
         credentials: 'include'
       })      
-      console.log('response.text()',response)
     } catch (error) {
       console.log(error)
     }

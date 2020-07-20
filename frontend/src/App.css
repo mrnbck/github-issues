@@ -8,7 +8,7 @@ textarea { box-sizing: border-box; border: 1px solid #cbcbcb; margin-bottom: 10p
 .menu { position: fixed; display: flex; flex-wrap: nowrap; width: 100%; overflow-x: hidden; flex-direction: row; background-color: #252525; color: #fdf6f6; padding: 15px; align-items: center; z-index: 2; }
 .menu-searchbar { display: flex; flex-direction: row; align-items: center; flex-wrap: noWrap; }
 .search-input { width: 200px; line-height: 20px; padding: 6px; font-size: 14px; margin-left: 20px; padding-left: 10px; outline: none; border: none }
-.issue-list { width: 75%; margin: 45px auto 60px; border-bottom: 1px solid #dadada; font-size: 16px; font-weight: 500;}
+.issue-list { width: 75%; max-width: 980px; margin: 45px auto 60px; border-bottom: 1px solid #dadada; font-size: 16px; font-weight: 500;}
 .issue-list-item { padding: 20px; border: 1px solid #dadada; border-bottom: none; color: #252525; background-color: #ddd; margin-bottom: 3px; }
 .issue-header { display: flex; flex-direction: row; align-items: center }
 .issue-state-open, .issue-state-closed, .issue-list-label, .issue-comments { background-color: #28a745; padding: 5px 10px; border-radius: 15px; color: white; margin: 0px 2px 0px 3px; text-transform: lowercase }
@@ -50,7 +50,7 @@ textarea { box-sizing: border-box; border: 1px solid #cbcbcb; margin-bottom: 10p
 .cancel-button, .update-button {background-color: #808080; visibility: hidden; height: 0px; align-self: end; margin-right: 10px; }
 .update-button { background-color: #252525;}
 .comment-top-bar { display: flex; flex-direction: row; justify-content: flex-end; }
-.comment-header { border-bottom: 1px solid #cbcbcb; padding: 10px; display: flex; justify-content: space-between; background-color: #dcdcdc; }
+.comment-header { border-bottom: 1px solid #cbcbcb; padding: 10px; display: flex; justify-content: space-between; background-color: #eee; }
 .no-comments { margin: 30px 0px; padding: 30px; border: 1px solid #cbcbcb; }
 .comments-padding {  padding: 5px 25px 15px }
 #label-button { position: relative; background-color: #252525; color: white; font-weight: 700; margin-left: 10px; margin-top: 5px; height: 23px; border-style: none; padding: 0 5px; }

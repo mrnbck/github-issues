@@ -18,8 +18,6 @@ const MyIssues = ({
     // eslint-disable-next-line
     },[currentPage])
   
-  console.log(issues)
-
   if (issues[0] === 'login') {
     
     const handleLogin = async (event) => {

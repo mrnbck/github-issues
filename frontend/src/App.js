@@ -30,7 +30,8 @@ const App = () => {
     } else if (myIssues) {
       const checkLogin = async () => {
         const login = await axios.get('/api/checkLogin', 
-          { withCredentials: true }).catch(error => error)        
+          { withCredentials: true }).catch(error => error)
+              
         if (login.data === false) {
           //check for 'login' in my issues to display login button
           setIssues(['login'])
@@ -59,6 +60,7 @@ const App = () => {
           if ((filter !== '' || qualifiers.length > 0) && 
                Number(currentPage)>0 ) {
             setIssues(response.data.items)
+            //console.log(response.data.items)
             //setPaginationLinks(response.data.link)
             setTotalCount(response.data.total_count)
             setShowIssue(false)
@@ -73,7 +75,7 @@ const App = () => {
           }
         })
         .catch((error) => {   
-          console.log(url) 
+          console.log('error: ', url) 
           console.log('error: ', error)
           setIssues([])
           return (
@@ -94,8 +96,9 @@ const App = () => {
     setFilter(search)
     setMyIssues(false) 
     setShowIssue(false) 
-    if (qualifiers.length > 0) {
-      setUrl(baseUrl+search+'+'+qualifiers.join('')+'&page=1')
+    if (qualifiers.length > 0) 
+    { setUrl(baseUrl+search+'+'+qualifiers.join('')+'&page=1')
+      
     }
     else if (search !== '') {
       setUrl(baseUrl+search+'&page=1')

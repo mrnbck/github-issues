@@ -72,6 +72,7 @@ const NumberOfComments = ({
   //track value in input field and save it in the correct state 
   const inputFieldValue = () => {
     if (moreThanRef.value) {
+
       setMoreThanSearch(`comments:>${moreThanRef.value}`)
     }
     if (lessThanRef.value) {
@@ -135,7 +136,7 @@ const NumberOfComments = ({
     //search in qualifiers if current qualifier already exists
     //check all 3 regex since the key is different every time
     const findEntry = qualifiers.filter(value => {
-      console.log(moreThanRegex.exec(value))
+      //console.log(moreThanRegex.exec(value))
       if (moreThanRegex.exec(value)) {
         return (moreThanRegex.exec(value))
       }

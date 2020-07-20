@@ -29,7 +29,7 @@ const ShowIssues = ({
       <div>{issues.map(issue => {
         const user = issue.repository_url.split('/')[4]
         const repo = issue.repository_url.split('/')[5]
-
+                
         return (
           <div 
             key={issue.id} 
@@ -42,8 +42,9 @@ const ShowIssues = ({
                 #{issue.number} opened by {issue.user.login} on&nbsp;
               {convertDate(issue.created_at, 'noTime')}
               <span className={issueState(issue.state)}>{issue.state}</span>
-              <span className='issue-comments'>{issue.comments}&nbsp; 
-                {<i className="far fa-comment"></i>}</span>
+              {//<span className='issue-comments'>{issue.comments}&nbsp; 
+                // {<i className="far fa-comment"></i>}</span>
+              }
               <span>{issue.labels.length > 0 ? 
                 issue.labels.map((label,index) => {
                   return <span className='issue-list-label' key={index}>
