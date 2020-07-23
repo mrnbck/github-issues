@@ -4,6 +4,9 @@
   "version": "1.0.0",
   "description": "proxy to avoid CORS",
   "main": "index.js",
+  "engines": {
+    "node": "10.x"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "server": "nodemon index.js",
@@ -19,12 +22,5 @@
     "express": "^4.17.1",
     "nodemon": "^2.0.4",
     "axios": "^0.19.2"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
-  },
-  "devDependencies": {
-    "eslint": "^7.4.0",
-    "eslint-plugin-react": "^7.20.3"
   }
 }
