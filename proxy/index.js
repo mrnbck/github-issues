@@ -9,16 +9,18 @@ const app = express()
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
+const client = `client_id=${process.env.CLIENT}`
+const secret = `client_secret=${process.env.SECRET}`
+const redirect = `&redirect_uri=${process.env.REDIRECT}`
+const state = `&state=${process.env.STATE}`
+
 app.get('/api/login', async (req, res) => {
   // eslint-disable-next-line no-unused-vars
 
-  const client = process.env.CLIENT
-  const redirect = process.env.REDIRECT
-  const state = process.env.STATE
-  const scope = 'scope=repo'
+  const scope = '&scope=repo'
   const baseUrl = 'https://github.com/login/oauth/authorize?'
 
-  const fullUrl = baseUrl + client + redirect + '&' + scope + state
+  const fullUrl = baseUrl + client + redirect + scope + state
 
   res.send(fullUrl)
 })
@@ -26,28 +28,18 @@ app.get('/api/login', async (req, res) => {
 // eslint-disable-next-line no-unused-vars
 app.get('/api/oauth-token/:code/:state', async (req, res) => {
   
-  //console.log(req.params.code)
-
-  const client = process.env.CLIENT
-  const secret = process.env.SECRET
-
-  if (`&state=${req.params.state}` === process.env.STATE) {
+  if (`&state=${req.params.state}` === state) {
 
     const url = 'https://github.com/login/oauth/access_token' 
     const fullUrl = `${url}?${client}&${secret}&code=${req.params.code}`
   
     try {
       const result = await axios.post(fullUrl)
-      console.log(result.status, ': ', result.statusText)
       const token = result.data.match(/access_token=([^&]+)/)[1]
   
       res.cookie('user_session', token, 
         { httpOnly: true, path: '/', secure: true, sameSite: 'lax' })
-      //res.setHeader('Set-Cookie', 
-      //  [`user_session=${token}; Path=/; secure; HttpOnly; SameSite=Lax`])
-      //res.setHeader('Access-Control-Allow-Credentials', true)
-      //res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000')
-
+      
       res.send(token)
     } 
     catch (error) {
@@ -58,95 +50,15 @@ app.get('/api/oauth-token/:code/:state', async (req, res) => {
   else return res.sendStatus(403)
 })
 
-app.get('/api/issues/:query', async (req, res) => {
-  const query = req.params.query
-  const url = 'https://api.github.com/search/issues?q='
-  const fullUrl = url + query
-
-  const regex=/user_session=([^;]+)/
-  
-  if (req.headers.cookie.match(regex) !== null) {
-    
-    const user_session = req.headers.cookie.match(regex)[1]
-
-    const config = {
-      headers: { authorization: 'token ' + user_session },
-    }        
-    try {
-      const result = await axios.get(fullUrl, config)
-      //console.log('headers', result.headers)
-      //console.log('data', result.data)
-
-      const data = result.data
-      console.log('Rate Limit remaining', 
-        result.headers['x-ratelimit-remaining'])
-      res.status(200)
-      res.send(data)
-    } catch (error) {
-      console.log(error)
-      res.sendStatus(error.response.status)
-    }
-  } 
-  else {
-    try {
-      const result = await axios.get(fullUrl)
-      const data = result.data
-      console.log('Rate Limit remaining', 
-        result.headers['x-ratelimit-remaining'])
-      res.status(200)
-      res.send(data)
-    } 
-    catch (error) {
-      console.log(error)
-      res.sendStatus(error.response.status)
-    }
-  } 
+app.get('api/logout', async (req, res) => {
+  res.clearCookie('user_session', { 
+    httpOnly: true, path: '/', secure: true, sameSite: 'lax' 
+  })
+  res.sendStatus(200)
 })
 
-app.get('/api/my-issues/:id', async (req, res) => {
-  
-  const regex=/user_session=([^;]+)/
-
-  if (req.headers.cookie.match(regex) !== null) {
-    const user_session = req.headers.cookie.match(regex)[1]
-
-    const config = {
-      headers: { authorization: 'token ' + user_session },
-    }
-
-    try {
-      const myIssues = await axios.get('https://api.github.com/issues', config)
-      const data = myIssues.data
-
-      data.length > 0 ? res.status(200) : res.status(404)
-      res.status(200)
-      res.send(data) 
-    } catch(error) {
-      console.log('My Issues', error.response.status, '-', 
-        error.response.statusText)
-      res.status(error.response.status)
-      res.send(error.error)
-    }
-
-
-  } else {
-    try {
-      const myIssues = await axios.get('https://api.github.com/issues')
-      const data = myIssues.data
-      data.length > 0 ? res.status(200) : res.status(404)
-      res.send(data)
-    } catch(error) {
-      console.log(error.response.status, '-', error.response.statusText)
-      if (error.response.status === 404) {
-        res.sendStatus(204)
-      } else
-        res.sendStatus(error.response.status)
-    }
-  }
-
-})
-
-app.get('/api/checkLogin', async (req, res) => {
+//not needed anymore
+/* app.get('/api/checkLogin', async (req, res) => {
   
   const regex=/user_session=([^;]+)/
 
@@ -158,13 +70,12 @@ app.get('/api/checkLogin', async (req, res) => {
     res.status(202).send('false')
   }
 }
-)
+) */
     
-
 app.get('/api/user', async (req, res) => {
 
   const regex=/user_session=([^;]+)/
-  if (req.headers.cookie.match(regex) !== null) {
+  if (req.headers.cookie && req.headers.cookie.match(regex) !== null) {
     const user_session = req.headers.cookie.match(regex)[1]
 
     const config = {
@@ -183,6 +94,139 @@ app.get('/api/user', async (req, res) => {
   } else res.status(202).send('false')
 })
 
+app.get('/api/issues/:query', async (req, res) => {
+  const query = req.params.query
+  const url = 'https://api.github.com/search/issues?q='
+  const fullUrl = url + query
+
+  try {
+    const result = await axios.get(fullUrl, { auth: {
+      username: process.env.CLIENT,
+      password: process.env.SECRET
+    }
+    })
+
+    const data = result.data
+    console.log('Rate Limit remaining', 
+      result.headers['x-ratelimit-remaining'])
+    if (data.total_count === 0) {
+      res.sendStatus(204)
+    } else {
+      res.status(200)
+      res.send(data)
+    }
+  } catch (error) {
+    console.log('/api/issues/:query', 
+      error.response.status, error.response.statusText)
+    if (error.response.status === 400) {
+      res.sendStatus(204)
+    } else res.sendStatus(error.response.status)
+  }
+})
+
+app.get('/api/my-issues/:id', async (req, res) => {
+  
+  const regex=/user_session=([^;]+)/
+
+  if (req.headers.cookie && req.headers.cookie.match(regex) !== null) {
+    const user_session = req.headers.cookie.match(regex)[1]
+
+    const config = {
+      headers: { authorization: 'token ' + user_session },
+    }
+
+    try {
+      const result = await axios.get('https://api.github.com/issues', config)
+      const data = result.data
+      console.log('Rate Limit remaining', 
+        result.headers['x-ratelimit-remaining'])
+      data.length > 0 ? res.status(200) : res.status(404)
+      res.status(200)
+      res.send(data) 
+    } catch(error) {
+      console.log('My Issues', error.response.status, '-', 
+        error.response.statusText)
+      res.status(error.response.status)
+      res.send(error.error)
+    }
+
+
+  } 
+})
+
+app.get('/api/repos/:owner/:repo/issues/:id/comments', async (req, res) => {
+  const owner = req.params.owner
+  const repo = req.params.repo
+  const id = req.params.id
+
+  try {
+    const result = await axios.get('https://api.github.com/repos/'+
+    `${owner}/${repo}/issues/${id}/comments`, { auth: {
+      username: process.env.CLIENT,
+      password: process.env.SECRET
+    }    
+    })
+    const data = result.data
+    console.log('Rate Limit remaining', 
+      result.headers['x-ratelimit-remaining'])
+    data.length > 0 ? res.status(200) : res.status(404)
+    res.status(200)
+    res.send(data) 
+  } catch(error) {
+    error.response.status ? 
+      res.sendStatus(error.response.status) :
+      res.sendStatus(400)
+  }
+})
+
+app.get('/api/repos/:owner/:repo/pulls/:id/comments', async (req, res) => {
+  const owner = req.params.owner
+  const repo = req.params.repo
+  const id = req.params.id
+
+  try {
+    const result = await axios.get('https://api.github.com/repos/'+
+    `${owner}/${repo}/pulls/${id}/comments`, { auth: {
+      username: process.env.CLIENT,
+      password: process.env.SECRET
+    }
+    })
+    const data = result.data
+    console.log('Rate Limit remaining', 
+      result.headers['x-ratelimit-remaining'])
+    data.length > 0 ? res.status(200) : res.status(404)
+    res.status(200)
+    res.send(data) 
+  } catch(error) {
+    console.log(error)
+    res.sendStatus(error.response.status)
+  }
+})
+
+app.get('/api/repos/:owner/:repo/pulls/:id/commits', async (req, res) => {
+  const owner = req.params.owner
+  const repo = req.params.repo
+  const id = req.params.id
+
+  try {
+    const result = await axios.get('https://api.github.com/repos/'+
+    `${owner}/${repo}/pulls/${id}/commits`, { auth: {
+      username: process.env.CLIENT,
+      password: process.env.SECRET
+    }
+    })
+    const data = result.data
+    console.log('Rate Limit remaining', 
+      result.headers['x-ratelimit-remaining'])
+    data.length > 0 ? res.status(200) : res.status(404)
+    res.status(200)
+    res.send(data) 
+  } catch(error) {
+    console.log(error)
+    res.sendStatus(error.response.status)
+  }
+})
+
 app.post('/api/repos/:owner/:repo/issues/:id/comments', async (req,res) => {
   const owner = req.params.owner
   const repo = req.params.repo
@@ -195,8 +239,6 @@ app.post('/api/repos/:owner/:repo/issues/:id/comments', async (req,res) => {
     headers: { authorization: 'token ' + user_session },
   }
 
-  console.log(req.body)
-
   try {
     await axios.post('https://api.github.com/repos/'+
     `${owner}/${repo}/issues/${id}/comments`, req.body, config)
@@ -205,15 +247,12 @@ app.post('/api/repos/:owner/:repo/issues/:id/comments', async (req,res) => {
     console.log(error)
     res.sendStatus(400)
   }
-
 })
 
 app.patch('/api/repos/:owner/:repo/issues/comments/:id', async (req,res) => {
   const owner = req.params.owner
   const repo = req.params.repo
   const id = req.params.id
-
-  console.log(req.url)
 
   const regex=/user_session=([^;]+)/
   const user_session = req.headers.cookie.match(regex)[1]
@@ -227,19 +266,16 @@ app.patch('/api/repos/:owner/:repo/issues/comments/:id', async (req,res) => {
     `${owner}/${repo}/issues/comments/${id}`, req.body, config)
     res.sendStatus(200) 
   } catch(error) {
-    console.log(error)
+    console.log('Update Comment', 
+      error.response.status, error.response.statusText)
     res.sendStatus(400)
   }
-
 })
 
 app.delete('/api/repos/:owner/:repo/issues/comments/:id', async (req,res) => {
   const owner = req.params.owner
   const repo = req.params.repo
   const id = req.params.id
-
-  //res.setHeader('Access-Control-Allow-Credentials', true)
-  //res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000')
 
   const regex=/user_session=([^;]+)/
   const user_session = req.headers.cookie.match(regex)[1]
@@ -260,7 +296,7 @@ app.delete('/api/repos/:owner/:repo/issues/comments/:id', async (req,res) => {
 
 if (process.env.NODE_ENV === 'production') {
   var corsOptions = {
-    origin: 'https://infinite-stream-95019.herokuapp.com/',
+    origin: process.env.ORIGIN,
     optionsSuccessStatus: 200, // some  browsers choke on 204
     credentials: true
   }
@@ -285,7 +321,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 const unknownEndpoint = (request, response) => {
-  console.log(request.url)
+  console.log('unknown endpoint', request.url)
   response.status(404).send({ error: 'unknown endpoint' })
 }
 

@@ -6,8 +6,9 @@ import ReactMarkdown from 'react-markdown'
 import '@fortawesome/fontawesome-free/css/all.css'
 import { 
   BrowserRouter as Router, Link } from 'react-router-dom'
-import timeStamp from '../helpers/timeStamp'
 import convertDate from '../helpers/convertDate'
+import fetchComments from '../helpers/fetchComments'
+import handleSubmitComment from '../helpers/handleSubmitComments'
 import ShowComments from './ShowComments'
 
 const OpenIssue = ({ 
@@ -20,85 +21,30 @@ const OpenIssue = ({
   const [newComment, setNewComment] = useState('')
   const [user, setUser] = useState('')
   
-  const fetchComments = async () => {
-    //check here if the user is already logged in. 
-    
-    const url = '/api/user'
-    //get authenticated user
-    const fetchUser = async () => {
-      try {
-        const user = await axios(url, { withCredentials: 'true' })
-        
-        if (user.data) {
-          setUser(user.data)
-          setLogin(true)
-        }
-      } catch(error) {
-        console.log(error)
-      }
-    }
-    fetchUser()
-
-    const issueComments = await axios.get(issue.comments_url)
-        
-    if (issue.pull_request) {
-      const pullUrl = issue.pull_request.url+'/comments'    
-      const pullComments = await axios.get(pullUrl)
-    
-      const commitsUrl = issue.pull_request.url+'/commits' 
-      const commits = await axios.get(commitsUrl)
-      const commitMessages = commits.data.map(commit => {
-        if (commit.author !== null && commit.commit.message && commit.url) {
-          try {
-            const commitObject = {
-              user: {
-                login: commit.author.login
-              },
-              created_at: commit.commit.author.date,
-              updated_at: commit.commit.author.date,
-              body: commit.commit.message,
-              url: commit.url,
-              type: 'commit'
-            } 
-            return commitObject
-          } catch(error) {
-            console.log(error)
-          }
-        }})
-
-      if (commitMessages[0] !== undefined) {
-        setCommentsList(issueComments.data
-          .concat(pullComments.data, commitMessages).sort((a,b) => {
-          //console.log(new Date(a.created_at) - new Date(b.created_at))
-            return new Date(a.created_at) - new Date(b.created_at)
-          } ) 
-        ) }
-      else {
-        setCommentsList(issueComments.data
-          .concat(pullComments.data).sort((a,b) => {
-            //console.log(new Date(a.created_at) - new Date(b.created_at))
-            return new Date(a.created_at) - new Date(b.created_at)
-          } ) 
-        )
-      } 
-    }
-    else setCommentsList(issueComments.data)    
-  }
-
   //refresh issue when opening
   useEffect(()  => {
 
-    const refreshIssue = async () => {
-     
-      const getIssue = await axios.get(issue.url)      
-      setIssue(getIssue.data)
+    //add try/catch in case I receive a 403
+    const refreshIssue = async () => {     
+      try {
+        const getIssue = await axios.get(issue.url)      
+        setIssue(getIssue.data)
+      } catch(error) {
+        console.log(error)
+      }
     }
     refreshIssue()
     // eslint-disable-next-line
   }, [])
   
   useEffect(() => {    
-    fetchComments()
+    fetchComments(
+      setUser, 
+      setLogin, 
+      issue, 
+      setCommentsList, 
+      newComment, 
+      setNewComment)
     // eslint-disable-next-line
   },[])
 
@@ -128,37 +74,6 @@ const OpenIssue = ({
         
     }
 
-    const handleSubmitComment = async () => {
-      const regex = /repos\/([\D]|[\w])+/
-      const url = `/api/${issue.comments_url.match(regex)[0]}/`
-
-      const time = timeStamp()
-
-      const commentObject = {
-        user: {
-          login: user
-        },
-        body: newComment,
-        created_at: time
-      }
-
-      try {
-        await fetch(url, { 
-          method: 'POST',
-          body: JSON.stringify(commentObject),
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        })
-      } catch(error) {
-        console.log(error)
-      }
-      setNewComment('')
-      console.log(commentsList)
-      setCommentsList(commentsList.concat(commentObject))
-    }
-
     const handleComment = (event) => {
       event.preventDefault()
       setNewComment(event.target.value)
@@ -178,6 +93,12 @@ const OpenIssue = ({
       window.location.assign(url)
     }
 
+    const issueState = (state) => {
+      if (state === 'open') {
+        return 'issue-state-open'
+      } else return 'issue-state-closed'
+    }
+
     return (
       <div>
         <div className='display-issue'>
@@ -185,11 +106,11 @@ const OpenIssue = ({
             onClick={() => close() }></i>
           <h1>{issue.title} #{issue.number}</h1>
           <div className='issue-header'>
-            <span className='issue-state-open'>{issue.state}</span>
+            <span className={issueState(issue.state)}>{issue.state}</span>
             <span className='font-color-grey'>
             &nbsp;{issue.user.login} opened this issue on&nbsp;
               {convertDate(issue.created_at, 'noTime')} |&nbsp;
-              Comments: {issue.comments} 
+              Comments: {commentsList.length} 
             </span>
             <a href={issue.html_url} 
               target="_blank" 
@@ -210,8 +131,14 @@ const OpenIssue = ({
                     user={user}
                   />}
                 </div>
-                <div className='refresh-icon' onClick={() => fetchComments()}>
-                  <i className="fas fa-sync"></i>
+                <div style={{ textAlign: 'end' }}>
+                  <i className='fas fa-sync refresh-icon' onClick={() => 
+                    fetchComments( 
+                      setUser, 
+                      setLogin, 
+                      issue, 
+                      setCommentsList)}>
+                  </i>
                 </div>
               </div>                    
               {!login ? (
@@ -237,7 +164,14 @@ const OpenIssue = ({
                   </textarea>
                   <button 
                     className='button comment-button' 
-                    onClick={handleSubmitComment}>Comment
+                    onClick={() => handleSubmitComment(
+                      issue, 
+                      user, 
+                      commentsList, 
+                      setCommentsList,
+                      newComment, 
+                      setNewComment)}>
+                      Comment
                   </button>
                 </div>)}
               <button 

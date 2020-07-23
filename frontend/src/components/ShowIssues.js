@@ -45,7 +45,7 @@ const ShowIssues = ({
               {//<span className='issue-comments'>{issue.comments}&nbsp; 
                 // {<i className="far fa-comment"></i>}</span>
               }
-              <span>{issue.labels.length > 0 ? 
+              <span className='labels'>{issue.labels.length > 0 ? 
                 issue.labels.map((label,index) => {
                   return <span className='issue-list-label' key={index}>
                     {label.name}

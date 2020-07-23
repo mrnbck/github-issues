@@ -21,7 +21,7 @@ const Navigation = ({
   myIssues }) => {
 
   const [issue, setIssue] = useState({})
-
+    
   if ((filter !== '' || qualifiers !== '') && totalCount > 0) {
     let last = 0
     if (totalCount > 1000) {

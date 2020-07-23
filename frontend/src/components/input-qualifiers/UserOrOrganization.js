@@ -65,8 +65,6 @@ const UserOrOrganization = ({
     const id = 
       option[option.selectedIndex].value
 
-    console.log('id', id)
-
     //remember whether USERNAME, ORGANIZATION or REPO
     setInputField(id)    
   }

@@ -64,8 +64,6 @@ const NumberOfComments = ({
     const id = 
       option[option.selectedIndex].value
 
-    console.log('id', id)
-
     setInputField(id)    
   }
 

@@ -45,6 +45,12 @@ const IssueList = ({
     }    
     // eslint-disable-next-line
   },[currentPage])
+  
+  if (issues === undefined) {
+    return (
+      <div className='no-results'>No results matched your search.</div>
+    )
+  }
 
   return (
     <div><ShowIssues 

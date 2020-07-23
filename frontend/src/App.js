@@ -29,7 +29,7 @@ const App = () => {
       //do nothing
     } else if (myIssues) {
       const checkLogin = async () => {
-        const login = await axios.get('/api/checkLogin', 
+        const login = await axios.get('/api/user', 
           { withCredentials: true }).catch(error => error)
               
         if (login.data === false) {
@@ -62,7 +62,10 @@ const App = () => {
             setIssues(response.data.items)
             //console.log(response.data.items)
             //setPaginationLinks(response.data.link)
-            setTotalCount(response.data.total_count)
+            response.data.total_count === 0 || 
+            response.data.total_count === undefined ? 
+              setTotalCount(1) :
+              setTotalCount(response.data.total_count)
             setShowIssue(false)
             window.scrollTo(0, 0)
             //console.log('qualifiers in App',qualifiers)
