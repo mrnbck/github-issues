@@ -50,7 +50,7 @@ app.get('/api/oauth-token/:code/:state', async (req, res) => {
   else return res.sendStatus(403)
 })
 
-app.get('api/logout', async (req, res) => {
+app.get('/api/logout', async (req, res) => {
   res.clearCookie('user_session', { 
     httpOnly: true, path: '/', secure: true, sameSite: 'lax' 
   })
