@@ -56,22 +56,7 @@ app.get('/api/logout', async (req, res) => {
   })
   res.sendStatus(200)
 })
-
-//not needed anymore
-/* app.get('/api/checkLogin', async (req, res) => {
-  
-  const regex=/user_session=([^;]+)/
-
-  if (req.headers.cookie.match(regex) !== null) {
-
-    res.status(200)
-    res.send('true')
-  } else {
-    res.status(202).send('false')
-  }
-}
-) */
-    
+   
 app.get('/api/user', async (req, res) => {
 
   const regex=/user_session=([^;]+)/
