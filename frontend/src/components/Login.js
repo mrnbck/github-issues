@@ -1,6 +1,11 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import PropTypes from 'prop-types'
 
-const Login = () => {
+const Login = ({ setLoggedIn }) => {
+  
+  useEffect(() => {
+    setLoggedIn(true)
+  })
   
   const url = window.location + ''
   const code = url.match(/code=([^&]+)/)[1]
@@ -17,11 +22,15 @@ const Login = () => {
     }
   }
   getToken(code)
-
   return (
     <>
       <div>Logging in</div>
     </>
   )
 }
+
+Login.propTypes = {
+  setLoggedIn:PropTypes.func
+}
+
 export default Login

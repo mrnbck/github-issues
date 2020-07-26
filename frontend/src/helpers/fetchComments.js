@@ -27,14 +27,13 @@ const fetchComments = async (setUser, setLogin, issue, setCommentsList) => {
       .get(issueCommentsUrl, { withCredentials: 'true' }) 
     
     if (issue.pull_request) {
-      const pullUrl = `/api/${issue.pull_request.url
-        .match(regex)[0]}`+'/comments'    
+      const pullUrl = `/api/${issue.pull_request.url.match(regex)[0]}/comments`
 
       const pullComments = await axios
         .get(pullUrl, { withCredentials: 'true' }) 
       
       const commitsUrl = `/api/${issue.pull_request.url
-        .match(regex)[0]}`+'/commits' 
+        .match(regex)[0]}/commits`
       const commits = await axios
         .get(commitsUrl, { withCredentials: 'true' })
         

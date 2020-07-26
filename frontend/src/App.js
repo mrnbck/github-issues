@@ -20,11 +20,23 @@ const App = () => {
   const [qualifiers, setQualifiers] = useState([])
   const [showIssue, setShowIssue] = useState(false)
   const [myIssues, setMyIssues] = useState(false)
+  const [loggedIn, setLoggedIn] = useState(false)
     
   let searchInput = createRef()
   let baseUrl = '/api/issues/'
 
   useEffect(() => {
+    if (!loggedIn) {
+      const checkLogin = async () => {
+        const login = await axios.get('/api/user', 
+          { withCredentials: true }).catch(error => error)
+              
+        if (login.data !== false) {
+          setLoggedIn(true)
+        }
+      }
+      checkLogin()
+    }
     if (url === undefined || url===baseUrl+'&page=1') {
       //do nothing
     } else if (myIssues) {
@@ -105,7 +117,12 @@ const App = () => {
     }
     else if (search !== '') {
       setUrl(baseUrl+search+'&page=1')
-    }    
+    } else if (search === '') {
+      setShowIssue(false)
+      setMyIssues(false)
+      setIssues('')
+      setTotalCount('')
+    }   
   }
 
   const showMyIssues = () => {
@@ -115,29 +132,6 @@ const App = () => {
     setCurrentPage(1)
     setFilter('')
     setUrl('/api/my-issues/1')
-  }
-
-  const redirectAfterSearch = () => {
-
-    if (myIssues) {
-      return (
-        <Router>
-          <Redirect to={`/my-issues/${Number(currentPage)}`} />
-        </Router>)
-    }    
-    else if (filter === '' && qualifiers.length === 0) {
-      return (
-        <Router>
-          <Route exact path={'/login'} render={() => <Login />} />
-          <Redirect to='/' />
-        </Router>)
-    }
-    else {
-      return (
-        <Router>
-          <Redirect to={`/issues/${Number(currentPage)}`} />
-        </Router>)
-    }      
   }
 
   const extendedSearchBar = () => {
@@ -166,6 +160,49 @@ const App = () => {
     setFilter(event.target.value)
   }
 
+  const handleLogout = () => {
+    fetch('/api/logout').catch(error => console.log(error))
+    document.getElementById('logout-container').style.opacity = '80%'
+    document.getElementById('logout-container').style.visibility = 'visible'
+    document.getElementById('logout-notification').style.visibility = 'visible'
+    setFilter('')
+    setShowIssue(false)
+    setMyIssues(false)
+    setIssues('')
+    setTotalCount('')
+    setLoggedIn(false)
+  }
+
+  const closeLogoutNotification = () => {
+    document.getElementById('logout-container').style.opacity = '0%'
+    document.getElementById('logout-container').style.visibility = 'hidden'
+    document.getElementById('logout-notification').style.visibility = 'hidden'
+  }
+
+  const redirectAfterSearch = () => {
+
+    if (myIssues) {
+      return (
+        <Router>
+          <Redirect to={`/my-issues/${Number(currentPage)}`} />
+        </Router>)
+    }    
+    else if (filter === '' && qualifiers.length === 0) {
+      return (
+        <Router>
+          <Route exact path={'/login'} render={() => 
+            <Login setLoggedIn={setLoggedIn}/>} />
+          <Redirect to='/' />
+        </Router>)
+    }
+    else {
+      return (
+        <Router>
+          <Redirect to={`/issues/${Number(currentPage)}`} />
+        </Router>)
+    }      
+  }
+
   return (
     <div className='page'>
       <div className='menu'>
@@ -185,6 +222,16 @@ const App = () => {
           </span>
         </form> 
         <div onClick={showMyIssues} className='my-issues'>My Issues</div>
+        <div onClick={handleLogout} className='logout'>
+          {loggedIn ? 'Logout' : ''}</div>
+        <div id='logout-container' onClick={closeLogoutNotification}></div>
+        <div id='logout-notification'>
+          You are no longer logged in to GitHub.
+          <button 
+            className='logout-ok-button' 
+            onClick={closeLogoutNotification}>OK
+          </button>
+        </div>        
       </div>
       <div className='extended-search' id='open-extended'>
         <span id='extended-search-content'>

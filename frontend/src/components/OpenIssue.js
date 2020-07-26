@@ -20,6 +20,7 @@ const OpenIssue = ({
   const [login, setLogin] = useState(false)
   const [newComment, setNewComment] = useState('')
   const [user, setUser] = useState('')
+  const [backToTop, setBackToTop] = useState(false)
   
   //refresh issue when opening
   useEffect(()  => {
@@ -64,6 +65,20 @@ const OpenIssue = ({
       setShowIssue(false)
     }
   })
+
+  useEffect(() => {    
+    const handleScroll = () => {
+      if (window.scrollY > 200) {
+        setBackToTop(true)
+      } else setBackToTop(false)
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+    }
+  }, [])
 
   if(showIssue) {
     const close = () => {
@@ -180,6 +195,13 @@ const OpenIssue = ({
                 <i className="fas fa-arrow-left"></i>
               </button>
             </div>  
+            <span>
+              {backToTop ? <i 
+                onClick={() => 
+                  window.scroll({ top: 0, left: 0, behavior: 'smooth' })}
+                className="fas fa-arrow-up back-to-top"></i> :
+                ''}
+            </span>
             <div className='sidebar'>
               <div className='font-color-grey'>Assigned To: </div>
               <div className='metadata'>{issue.assignee ? 

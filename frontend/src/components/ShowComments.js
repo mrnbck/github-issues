@@ -29,7 +29,7 @@ const ShowComments = ({
       <ul>{commentsList.map((comment, index) => {
         //some comments are empty, so we don't want to return anything
         if (!comment.user) {
-          return
+          return <></>
         }
         if (comment.type === 'commit') {
           return (
